@@ -1,34 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import clsx from "clsx";
-import { createMuiTheme } from "@material-ui/core/styles";
+import { createTheme } from "@material-ui/core/styles";
 import * as colors from "@material-ui/core/colors";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import { ThemeProvider } from "@material-ui/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import Drawer from "@material-ui/core/Drawer";
 import Box from "@material-ui/core/Box";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
-import List from "@material-ui/core/List";
 import Typography from "@material-ui/core/Typography";
-import Divider from "@material-ui/core/Divider";
 import Container from "@material-ui/core/Container";
 import { Link } from "react-router-dom";
 import MenuIcon from "@material-ui/icons/Menu";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
+
+import Sidebar from "../organisms/Sidebar";
 import IconButton from "@material-ui/core/IconButton";
-import HomeIcon from "@material-ui/icons/Home";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import AccountBoxIcon from '@mui/icons-material/AccountBox';
-import { signout } from "../../functions/signout";
-import { useHistory } from "react-router-dom"
+import Header from "../organisms/Header";
 
 const drawerWidth = 240;
 
-const theme = createMuiTheme({
+const theme = createTheme({
   typography: {
     fontFamily: [
       "Noto Sans JP",
@@ -135,7 +126,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     logoutButton: {
       verticalAlign: "bottom",
-    }
+    },
   })
 );
 
@@ -162,106 +153,13 @@ const GenericTemplate: React.FC<GenericTemplateProps> = ({
   title,
 }) => {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
-  
-  const history = useHistory();
-  const toSignout = () => {
-    signout().then((isSuccess) => {
-      if (!isSuccess) return;
-      history.push("/login")
-    })
-  }
+  const [open, setOpen] = useState(true);
 
   return (
     <ThemeProvider theme={theme}>
       <div className={classes.root}>
-        <CssBaseline />
-        <AppBar
-          position="absolute"
-          className={clsx(classes.appBar, open && classes.appBarShift)}
-        >
-          <Toolbar className={classes.toolbar}>
-            <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              className={clsx(
-                classes.menuButton,
-                open && classes.menuButtonHidden
-              )}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography
-              component="h1"
-              variant="h6"
-              color="inherit"
-              noWrap
-              className={classes.title}
-            >
-              MyjLab 入退室管理
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <Drawer
-          variant="permanent"
-          classes={{
-            paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
-          }}
-          open={open}
-        >
-          <div className={classes.toolbarIcon}>
-            <IconButton onClick={handleDrawerClose}>
-              <ChevronLeftIcon />
-            </IconButton>
-          </div>
-          <Divider />
-          <List>
-            <Link to="/" className={classes.link}>
-              <ListItem button>
-                <ListItemIcon>
-                  <HomeIcon />
-                </ListItemIcon>
-                <ListItemText primary="トップページ" />
-              </ListItem>
-            </Link>
-            <Link to="/products" className={classes.link}>
-              <ListItem button>
-                <ListItemIcon>
-                  <AccountBalanceIcon />
-                </ListItemIcon>
-                <ListItemText primary="今居るメンバー" />
-              </ListItem>
-            </Link>
-            <Link to="/all" className={classes.link}>
-              <ListItem button>
-                <ListItemIcon>
-                  <AccountBoxIcon />
-                </ListItemIcon>
-                <ListItemText primary="all members" />
-              </ListItem>
-            </Link>
-              <ListItem
-                button
-                className={classes.logoutButton + "" + classes.link}
-                onClick={() => {
-                  toSignout();
-                }}
-              >
-                <ListItemIcon>
-                  <AccountBoxIcon />
-                </ListItemIcon>
-                <ListItemText primary="ログアウト" />
-              </ListItem>
-          </List>
-        </Drawer>
+        <Header classes={classes} open={open} setOpen={setOpen} />
+        <Sidebar classes={classes} setOpen={setOpen} open={open} />
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
           <Container maxWidth="lg" className={classes.container}>
