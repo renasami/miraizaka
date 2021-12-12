@@ -18,11 +18,9 @@ import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import IconButton from "@material-ui/core/IconButton";
 import HomeIcon from "@material-ui/icons/Home";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import SidebarItem from "../molecules/SidebarItem"
 import { signout } from "../../functions/signout";
 import { useHistory } from "react-router-dom"
 
@@ -224,42 +222,31 @@ const GenericTemplate: React.FC<GenericTemplateProps> = ({
           </div>
           <Divider />
           <List>
-            <Link to="/" className={classes.link}>
-              <ListItem button>
-                <ListItemIcon>
-                  <HomeIcon />
-                </ListItemIcon>
-                <ListItemText primary="トップページ" />
-              </ListItem>
-            </Link>
-            <Link to="/products" className={classes.link}>
-              <ListItem button>
-                <ListItemIcon>
-                  <AccountBalanceIcon />
-                </ListItemIcon>
-                <ListItemText primary="今居るメンバー" />
-              </ListItem>
-            </Link>
-            <Link to="/all" className={classes.link}>
-              <ListItem button>
-                <ListItemIcon>
-                  <AccountBoxIcon />
-                </ListItemIcon>
-                <ListItemText primary="all members" />
-              </ListItem>
-            </Link>
-              <ListItem
-                button
-                className={classes.logoutButton + "" + classes.link}
-                onClick={() => {
-                  toSignout();
-                }}
-              >
-                <ListItemIcon>
-                  <AccountBoxIcon />
-                </ListItemIcon>
-                <ListItemText primary="ログアウト" />
-              </ListItem>
+            <SidebarItem
+              className={classes.link}
+              icon={< HomeIcon />}
+              itemText="トップ"
+              to="/"
+            />
+            <SidebarItem
+              className={classes.link}
+              icon={<AccountBalanceIcon />}
+              itemText="今いるメンバー"
+              to="/products"
+            />
+                <SidebarItem
+              className={classes.link}
+              icon={<AccountBoxIcon />}
+              itemText="all members"
+              to="/all"
+            />
+            <SidebarItem
+              className={classes.link}
+              onClick={()=>toSignout()}
+              icon={<AccountBoxIcon />}
+              itemText="ログアウト"
+              to="/"
+            />
           </List>
         </Drawer>
         <main className={classes.content}>
