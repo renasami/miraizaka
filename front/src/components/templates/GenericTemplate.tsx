@@ -15,6 +15,7 @@ import MenuIcon from "@material-ui/icons/Menu";
 
 import Sidebar from "../organisms/Sidebar";
 import IconButton from "@material-ui/core/IconButton";
+import Header from "../organisms/Header";
 
 const drawerWidth = 240;
 
@@ -153,45 +154,11 @@ const GenericTemplate: React.FC<GenericTemplateProps> = ({
 }) => {
   const classes = useStyles();
   const [open, setOpen] = useState(true);
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
 
   return (
     <ThemeProvider theme={theme}>
       <div className={classes.root}>
-        <CssBaseline />
-        <AppBar
-          position="absolute"
-          className={clsx(classes.appBar, open && classes.appBarShift)}
-        >
-          <Toolbar className={classes.toolbar}>
-            <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              className={clsx(
-                classes.menuButton,
-                open && classes.menuButtonHidden
-              )}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography
-              component="h1"
-              variant="h6"
-              color="inherit"
-              noWrap
-              className={classes.title}
-            >
-              MyjLab 入退室管理
-            </Typography>
-          </Toolbar>
-        </AppBar>
+        <Header classes={classes} open={open} setOpen={setOpen} />
         <Sidebar classes={classes} setOpen={setOpen} open={open} />
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import clsx from "clsx";
 import SidebarItem from '../molecules/SidebarItem'
 import List from "@material-ui/core/List";
