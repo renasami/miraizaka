@@ -1,12 +1,12 @@
 services:
   api:  
-      build: 
-        context: .
-        dockerfile: ./api/Dockerfile
-      # env_file: 
-      #   - ${ENV_FILE_PATH:-config.env}
-      ports: 
-        - 8080:80
-      restart: always
-      volumes:
-        - ./api/app:/app
+    build: 
+      context: .
+      dockerfile: ./api/Dockerfile
+    # env_file: 
+    #   - ${ENV_FILE_PATH:-config.env}
+    ports: 
+      - 8080:80
+    restart: always
+    volumes:
+      - ./api/app:/app

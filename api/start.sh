@@ -31,6 +31,6 @@ else
 fi
 
 # Start Gunicorn
-#exec gunicorn -k "$WORKER_CLASS" -c "$GUNICORN_CONF" "$APP_MODULE" --reload
-# exec uvicorn main:app --reload 
-gunicorn -w 3 -k uvicorn.workers.UvicornWorker main:app --reload
+# exec gunicorn -k "$WORKER_CLASS" -c "$GUNICORN_CONF" "$APP_MODULE"
+exec uvicorn main:app --reload --host 0.0.0.0 --port 80
+# gunicorn -w 3 -k uvicorn.workers.UvicornWorker main:app --reload
