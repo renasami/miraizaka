@@ -10,19 +10,15 @@ import { useHistory } from 'react-router-dom';
 import { signout } from '../../functions/signout';
 import { ClassNameMap } from '@mui/material';
 import Drawer from '@material-ui/core/Drawer';
+import SidebarIcon from '../molecules/SidebarIcon';
+import Divider from '@material-ui/core/Divider';
 type Props ={
-    classes:ClassNameMap
+    classes:ClassNameMap;
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>
+    open:boolean
 }
 const SideBar:React.FC<Props> = (props:Props) => {
     const history = useHistory();
-    const [open,setOpen] = useState(true);
-    const handleDrawerOpen = () => {
-        setOpen(true);
-      };
-      const handleDrawerClose = () => {
-        setOpen(false);
-      };
-
 
     const toSignout = () => {
         signout().then((isSuccess) => {
@@ -58,10 +54,12 @@ const SideBar:React.FC<Props> = (props:Props) => {
         <Drawer
             variant="permanent"
             classes={{
-                paper: clsx(props.classes.drawerPaper, !open && props.classes.drawerPaperClose),
+                paper: clsx(props.classes.drawerPaper, !props.open && props.classes.drawerPaperClose),
               }}
-            open={open}
+            open={props.open}
         >
+            <SidebarIcon classes={props.classes} setOpen={props.setOpen}/>
+            <Divider />
             <List>
                {listProps.map(item => <SidebarItem
                     className={props.classes.link}
