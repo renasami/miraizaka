@@ -1,20 +1,14 @@
 import React, { useState } from "react";
-import clsx from "clsx";
 import { createTheme } from "@material-ui/core/styles";
 import * as colors from "@material-ui/core/colors";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import { ThemeProvider } from "@material-ui/styles";
-import CssBaseline from "@material-ui/core/CssBaseline";
 import Box from "@material-ui/core/Box";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
 import { Link } from "react-router-dom";
-import MenuIcon from "@material-ui/icons/Menu";
 
 import Sidebar from "../organisms/Sidebar";
-import IconButton from "@material-ui/core/IconButton";
 import Header from "../organisms/Header";
 
 const drawerWidth = 240;
