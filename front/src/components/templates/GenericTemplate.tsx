@@ -1,6 +1,6 @@
 import React from "react";
 import clsx from "clsx";
-import { createMuiTheme } from "@material-ui/core/styles";
+import { createTheme } from "@material-ui/core/styles";
 import * as colors from "@material-ui/core/colors";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import { ThemeProvider } from "@material-ui/styles";
@@ -9,7 +9,6 @@ import Drawer from "@material-ui/core/Drawer";
 import Box from "@material-ui/core/Box";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
-import List from "@material-ui/core/List";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
 import Container from "@material-ui/core/Container";
@@ -17,16 +16,11 @@ import { Link } from "react-router-dom";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import IconButton from "@material-ui/core/IconButton";
-import HomeIcon from "@material-ui/icons/Home";
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import AccountBoxIcon from '@mui/icons-material/AccountBox';
-import SidebarItem from "../molecules/SidebarItem"
-import { signout } from "../../functions/signout";
-import { useHistory } from "react-router-dom"
+import Sidebar from "../organisms/Sidebar";
 
 const drawerWidth = 240;
 
-const theme = createMuiTheme({
+const theme = createTheme({
   typography: {
     fontFamily: [
       "Noto Sans JP",
@@ -168,13 +162,7 @@ const GenericTemplate: React.FC<GenericTemplateProps> = ({
     setOpen(false);
   };
   
-  const history = useHistory();
-  const toSignout = () => {
-    signout().then((isSuccess) => {
-      if (!isSuccess) return;
-      history.push("/login")
-    })
-  }
+  
 
   return (
     <ThemeProvider theme={theme}>
@@ -221,33 +209,7 @@ const GenericTemplate: React.FC<GenericTemplateProps> = ({
             </IconButton>
           </div>
           <Divider />
-          <List>
-            <SidebarItem
-              className={classes.link}
-              icon={< HomeIcon />}
-              itemText="トップ"
-              to="/"
-            />
-            <SidebarItem
-              className={classes.link}
-              icon={<AccountBalanceIcon />}
-              itemText="今いるメンバー"
-              to="/products"
-            />
-                <SidebarItem
-              className={classes.link}
-              icon={<AccountBoxIcon />}
-              itemText="all members"
-              to="/all"
-            />
-            <SidebarItem
-              className={classes.link}
-              onClick={()=>toSignout()}
-              icon={<AccountBoxIcon />}
-              itemText="ログアウト"
-              to="/"
-            />
-          </List>
+          <Sidebar classes={classes}/>
         </Drawer>
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
