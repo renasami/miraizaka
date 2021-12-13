@@ -1,10 +1,12 @@
-from fastapi import FastAPI,UploadFile,status,File
-from fastapi.params import File
+from fastapi import FastAPI, UploadFile, status, File
 from fastapi.responses import JSONResponse
-from starlette.responses import FileResponse
-from typing import List
-from app.schema import FaceSchema
+import cv2
+import numpy as np
 
+from typing import List
+import base64
+
+from app.schema import HTTPFace
 
 app = FastAPI()
 
@@ -18,18 +20,23 @@ def read_root():
 def read_item(item_id: int, q: str = None):
     return {"item_id": item_id, "q": q}
 
-  
-@app.post("/test_post")
-def test_post(x,y,w,h,cw,ch,file:UploadFile=File(...)):
-    print("Testing")
-    print(x,y,w,h,cw,ch)
-    print(file.read())
-    
-    return JSONResponse(content=file.filename,status_code=status.HTTP_200_OK)
 
-  
+@app.post("/test_post")
+def test_post(x, y, w, h, cw, ch, file: UploadFile = File(...)):
+    print("Testing")
+    print(x, y, w, h, cw, ch)
+    print(file.read())
+
+    return JSONResponse(content=file.filename, status_code=status.HTTP_200_OK)
+
+
 @app.post("/test")
-def test_p(face_list: List[FaceSchema]):
+def test_p(face_list: List[HTTPFace]):
+    size_li = []
     for i in face_list:
-        print(i.json())
-    return JSONResponse(status_code=status.HTTP_200_OK)
+        size_li.append({"file_size": len(i.img_base64)})
+        print(len(i.img_base64))
+        print(type(i.img_base64))
+        img = cv2.imdecode(np.fromstring(base64.b64decode(i.img_base64), dtype="uint8"), 1)
+        cv2.imwrite("/app/test.jpg", img)
+    return JSONResponse(content=size_li, status_code=status.HTTP_200_OK)
