@@ -6,10 +6,12 @@ const data ={
     labels: ["阿左見","大倉","太田","工藤","栗原","sei","前畑","溝口","宮田","山口","物部"],
 
     //need json to data structure
-    /* {
+    /* 
+      {
         name:"str",
         time:"int"(all amount of a month)
-    */}
+      }
+    */
     datasets: [
         {
             label: "今月の滞在時間",
