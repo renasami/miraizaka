@@ -5,8 +5,6 @@ import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import { ThemeProvider } from "@material-ui/styles";
 import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
-import { Link } from "react-router-dom";
-
 import Sidebar from "../organisms/Sidebar";
 import Header from "../organisms/Header";
 
