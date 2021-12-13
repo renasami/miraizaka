@@ -3,7 +3,6 @@ import { createTheme } from "@material-ui/core/styles";
 import * as colors from "@material-ui/core/colors";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import { ThemeProvider } from "@material-ui/styles";
-import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
 import { Link } from "react-router-dom";
@@ -124,19 +123,6 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const Copyright = () => {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" to="/">
-        MyjLab 入退室管理
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-};
-
 export interface GenericTemplateProps {
   children: React.ReactNode;
   title: string;
@@ -167,9 +153,6 @@ const GenericTemplate: React.FC<GenericTemplateProps> = ({
               {title}
             </Typography>
             {children}
-            <Box pt={4}>
-              <Copyright />
-            </Box>
           </Container>
         </main>
       </div>
