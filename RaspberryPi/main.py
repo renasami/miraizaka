@@ -4,7 +4,7 @@ import cv2
 import os
 from datetime import datetime
 
-from schema import Direction
+from ..api.app.schema import Direction
 
 FRAME_WIDTH, FRAME_HEIGHT = 800, 450
 # FRAME_WIDTH, FRAME_HEIGHT = 1280, 720
@@ -25,7 +25,7 @@ if SAVE_PIC:
     PATH += "/%s.jpg"
 
 profile_faceCascade = cv2.CascadeClassifier(
-    "RaspberryPi/haarcascades/haarcascade_profileface.xml"
+    "miraizaka/RaspberryPi/haarcascades/haarcascade_profileface.xml"
 )
 
 
