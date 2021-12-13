@@ -3,8 +3,12 @@ import cv2
 
 import os
 from datetime import datetime
+import json
+from pydantic import ValidationError
+import requests
+import base64
 
-from ..api.app.schema import Direction
+from ..api.app.schema import Direction, HTTPFace
 
 FRAME_WIDTH, FRAME_HEIGHT = 800, 450
 # FRAME_WIDTH, FRAME_HEIGHT = 1280, 720
@@ -16,6 +20,9 @@ OFFSET = 30
 SHOW_WINDOW = True
 SAVE_PIC = True
 SAVE_PIC = False
+SEND_HTTP = True
+
+URL = "http://192.168.0.117:8080/test"
 PATH = "/home/pi/vscoder/image"
 # PATH = "."
 if SAVE_PIC:
@@ -29,7 +36,9 @@ profile_faceCascade = cv2.CascadeClassifier(
 )
 
 
-def get_profile_face(img, frame_width, offset, scaleFactor, minNeighbors, minSize):
+def get_profile_face(
+    img, frame_width, frame_height, offset, scaleFactor, minNeighbors, minSize
+):
     """imgの中の顔を検出して座標と右顔か左顔かを返す\n
     以下のように取り出すことができる\n
     for (pos_x, pos_y, width, heigth, direction) in returned_obj
@@ -69,11 +78,54 @@ def get_profile_face(img, frame_width, offset, scaleFactor, minNeighbors, minSiz
     for i in range(len(profile_faces)):
 
         profile_faces[i, 0] -= offset
+        if profile_faces[i, 0] < 0:
+            profile_faces[i, 0] = 0
+
         profile_faces[i, 1] -= offset
+        if profile_faces[i, 1] < 0:
+            profile_faces[i, 1] = 0
+
         profile_faces[i, 2] += offset * 2
+        if profile_faces[i, 2] > frame_width:
+            profile_faces[i, 2] = frame_width
+
         profile_faces[i, 3] += offset * 2
+        if profile_faces[i, 3] > frame_height:
+            profile_faces[i, 3] = profile_faces[i, 3]
 
     return profile_faces
+
+
+def send_face(original_img, url, datetime, profile_faces, frame_width, frame_height):
+    data = []
+
+    for (pos_x, pos_y, width, heigth, direction) in profile_faces:
+        roi_color = original_img[pos_y:pos_y + heigth, pos_x:pos_x + width]
+        _, encing = cv2.imencode(".jpg", roi_color)
+        img_str = encing.tostring()
+        img_byte = base64.b64encode(img_str).decode("utf-8")
+
+        face_dict = {
+            "datetime": datetime,
+            "pos_x": pos_x,
+            "pos_y": pos_y,
+            "width": width,
+            "heigth": heigth,
+            "direction": direction,
+            "img_base64": img_byte,
+            "frame_width": frame_width,
+            "frame_height": frame_height
+        }
+
+        try:
+            face_obj = HTTPFace(**face_dict)
+        except ValidationError as e:
+            print(e.json())
+
+        data.append(json.loads(face_obj.json()))
+
+    res = requests.post(url=url, json=data)
+    return res.text
 
 
 if __name__ == "__main__":
@@ -91,6 +143,7 @@ if __name__ == "__main__":
         profile_faces = get_profile_face(
             img,
             FRAME_WIDTH,
+            FRAME_HEIGHT,
             OFFSET,
             SCALE_FACTOR_PROFILE,
             MIN_NEIGHBORS_PROFILE,
@@ -103,6 +156,10 @@ if __name__ == "__main__":
                 roi_color: np.ndarray = img[y:y + h, x:x + w]
                 if roi_color.size != 0:
                     cv2.imwrite(PATH % id, roi_color)
+
+        if SEND_HTTP and type(profile_faces) == np.ndarray:
+            res = send_face(img, URL, now, profile_faces, FRAME_WIDTH, FRAME_HEIGHT)
+            print(res)
 
         if SHOW_WINDOW:
             for (x, y, w, h, direction) in profile_faces:
