@@ -30,8 +30,8 @@ profile_faceCascade = cv2.CascadeClassifier(
 
 
 def get_profile_face(img, frame_width, offset, scaleFactor, minNeighbors, minSize):
-    """imgの中の顔を検出して座標と右顔か左顔かを返す
-    以下のように取り出すことができる
+    """imgの中の顔を検出して座標と右顔か左顔かを返す\n
+    以下のように取り出すことができる\n
     for (pos_x, pos_y, width, heigth, direction) in returned_obj
         ...
     """
