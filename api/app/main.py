@@ -2,6 +2,7 @@ from fastapi import FastAPI,UploadFile,status,File
 from fastapi.params import File
 from fastapi.responses import JSONResponse
 from starlette.responses import FileResponse
+from models import FaceSchema
 
 app = FastAPI()
 
@@ -16,9 +17,8 @@ def read_item(item_id: int, q: str = None):
     return {"item_id": item_id, "q": q}
 
 @app.post("/test_post")
-def test_post(x,y,w,h,cw,ch,file:UploadFile=File(...)):
-    print("Testing")
-    print(x,y,w,h,cw,ch)
-    print(file.read())
+def test_post(data:FaceSchema):
     
-    return JSONResponse(content=file.filename,status_code=status.HTTP_200_OK)
+    print(data)
+    
+    return JSONResponse(status_code=status.HTTP_200_OK)
