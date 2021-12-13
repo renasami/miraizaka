@@ -15,6 +15,6 @@ class FaceSchema(BaseModel):
     width: int
     heigth: int
     direction: Direction
-    img: bytes
+    img_base64: bytes
     frame_width: int
     frame_height: int
