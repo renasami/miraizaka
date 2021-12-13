@@ -1,7 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
 from enum import Enum
-from typing import Tuple
 
 
 class Direction(Enum):
@@ -17,5 +16,6 @@ class FaceSchema(BaseModel):
     width: int
     heigth: int
     direction: Direction
-    img: str
-    original_resolution: Tuple[int, int]
+    img: bytes
+    frame_width: int
+    frame_height: int
