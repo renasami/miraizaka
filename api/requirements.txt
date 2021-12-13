@@ -9,3 +9,5 @@ SQLAlchemy
 SQLAlchemy_Utils
 
 PyYAML
+
+opencv-python
