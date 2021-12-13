@@ -9,7 +9,7 @@ COPY ./api/app /app
 COPY ./api/requirements.txt requirements.txt
 RUN apt-get update && apt-get upgrade -y
 RUN /usr/local/bin/python -m pip install --upgrade pip
-RUN apt-get install -y libgl1-mesa-dev
+RUN apt-get install -y libgl1-mesa-dev libglib2.0-dev
 RUN pip install -r requirements.txt
 
 # 開発用
