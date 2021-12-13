@@ -1,5 +1,6 @@
 from fastapi import FastAPI, UploadFile, status, File
 from fastapi.responses import JSONResponse
+
 import cv2
 import numpy as np
 
@@ -7,6 +8,10 @@ from typing import List
 import base64
 
 from app.schema import HTTPFace
+
+from starlette.responses import FileResponse
+from models import FaceSchema
+
 
 app = FastAPI()
 
