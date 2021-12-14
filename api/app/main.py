@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 
 from typing import List
 import base64
-
+from keys import NOTIFY
 import requests
 
 from app.schema import HTTPFace
@@ -42,7 +42,7 @@ def notify(state:int):
     if state > 0:message = "入室" 
     else:message = "退出"
     headers = {
-        'Authorization': 'Bearer ltVMrvi3LqMYY3Cbd7p0fgBHEdvoLaW3Px8rMeugo7X',
+        'Authorization': NOTIFY,
     }
     files = {
         'message': (None,message ),
