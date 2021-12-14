@@ -1,11 +1,13 @@
 from fastapi import FastAPI, UploadFile, status, File
 from fastapi.responses import JSONResponse
-
-import cv2
-import numpy as np
+# import requests
+# import cv2
+# import numpy as np
 
 from typing import List
 import base64
+
+import requests
 
 from app.schema import HTTPFace
 
@@ -33,6 +35,22 @@ def test_post(x, y, w, h, cw, ch, file: UploadFile = File(...)):
     print(file.read())
 
     return JSONResponse(content=file.filename, status_code=status.HTTP_200_OK)
+
+@app.post("/notify")
+def notify(state:int):
+    message = ""
+    if state > 0:message = "入室" 
+    else:message = "退出"
+    headers = {
+        'Authorization': 'Bearer ltVMrvi3LqMYY3Cbd7p0fgBHEdvoLaW3Px8rMeugo7X',
+    }
+    files = {
+        'message': (None,message ),
+    }
+    response = requests.post('https://notify-api.line.me/api/notify', headers=headers, files=files)
+    return response.status_code
+
+        
 
 
 @app.post("/test")
