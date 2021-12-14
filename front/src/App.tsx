@@ -10,6 +10,7 @@ import ProductPage from "./components/pages/ProductPage";
 import HomePage from "./components/pages/HomePage";
 import Login from "./components/pages/Login";
 import AllMembers from "./components/pages/AllMembers";
+import LoginAdmin from "./components/pages/LoginAdmin";
 import { getAuth } from "firebase/auth";
 import { User } from "./type";
 
@@ -30,7 +31,6 @@ const App: React.FC = () => {
         setIsLoggedIn(false);
       }
     });
-    console.log(currentUser, isLoggedIn);
   });
 
   return (
@@ -40,6 +40,7 @@ const App: React.FC = () => {
         <Route path="/" render={_ => isLoggedIn ? (<HomePage/>):(<Redirect to="/login"/>)} exact />
         <Route path="/all" render={_ => isLoggedIn ? (<AllMembers/>):(<Redirect to="/login"/>)} exact />  
         <Route path="/login" render={_ => isLoggedIn ? (<Redirect to="/"/>):(<Login/>)} exact />
+        <Route path="/ytk" component={LoginAdmin} exact />
       </Switch>
     </Router>
   );
