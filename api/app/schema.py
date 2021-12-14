@@ -9,13 +9,16 @@ class Direction(Enum):
     RIGHT_FACE = -1
 
 
-class FaceSchema(BaseModel):
-    datetime: datetime
+class FaceBase(BaseModel):
     pos_x: int
     pos_y: int
     width: int
     heigth: int
     direction: Direction
+
+
+class FaceSchema(FaceBase):
+    datetime: datetime
     img_base64: bytes
     frame_width: int
     frame_height: int
