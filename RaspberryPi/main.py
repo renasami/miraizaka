@@ -12,14 +12,17 @@ from ..api.app.schema import Direction, HTTPFace
 
 FRAME_WIDTH, FRAME_HEIGHT = 800, 450
 # FRAME_WIDTH, FRAME_HEIGHT = 1280, 720
-SCALE_FACTOR_PROFILE = 1.3
-MIN_NEIGHBORS_PROFILE = 5
+SCALE_FACTOR_PROFILE = 2.8
+MIN_NEIGHBORS_PROFILE = 2
 MIN_SIZE_PROFILE = (20, 20)
 OFFSET = 30
 
 SHOW_WINDOW = True
+
 SAVE_PIC = True
 SAVE_PIC = False
+
+# SEND_HTTP = False
 SEND_HTTP = True
 
 URL = "http://192.168.0.117:8080/test"
@@ -128,7 +131,12 @@ def send_face(original_img, url, datetime, profile_faces, frame_width, frame_hei
     return res.text
 
 
-if __name__ == "__main__":
+def main(n):
+    def num_of_exec(n):
+        while n:
+            n -= 1
+            yield n
+
     cap = cv2.VideoCapture(0)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_WIDTH)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT)
@@ -136,7 +144,7 @@ if __name__ == "__main__":
     if SAVE_PIC:
         id = 0
 
-    while True:
+    for i in num_of_exec(n):
         ret, img = cap.read()
         now = datetime.now()
 
@@ -168,11 +176,16 @@ if __name__ == "__main__":
                 elif direction is Direction.RIGHT_FACE:
                     cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
-        cv2.imshow('video', img)
-        k = cv2.waitKey(30) & 0xff
-        if k == 27:  # press 'ESC' to quit
-            break
+            cv2.imshow('video', img)
+            k = cv2.waitKey(30) & 0xff
+            if k == 27:  # press 'ESC' to quit
+                break
 
     if SHOW_WINDOW:
         cap.release()
         cv2.destroyAllWindows()
+
+
+if __name__ == "__main__":
+    main(10)
+    print("end")
