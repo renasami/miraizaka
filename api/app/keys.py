@@ -1,1 +1,0 @@
-NOTIFY =  "Bearer ltVMrvi3LqMYY3Cbd7p0fgBHEdvoLaW3Px8rMeugo7X"
