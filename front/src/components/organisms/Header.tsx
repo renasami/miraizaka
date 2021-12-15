@@ -14,7 +14,7 @@ type Props = {
     setOpen:React.Dispatch<React.SetStateAction<boolean>>
 }
 
-
+//TODO:もう少し細い切り分け（sidebarに則った)
 const Header: React.FC<Props> = (props: Props) => {
 
     const handleDrawerOpen = () => {

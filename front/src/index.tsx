@@ -4,6 +4,8 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+
+//todo: 管理画面の作成
 ReactDOM.render(
   <React.StrictMode>
     <App />
