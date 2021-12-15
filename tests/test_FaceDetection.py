@@ -1,3 +1,10 @@
+import os
+import sys
+
+sys.path.append(
+    os.path.abspath(os.path.dirname(os.path.abspath(__file__)) + os.path.sep + "..")
+)
+
 import unittest
 import logging
 
@@ -11,12 +18,8 @@ from api.app.schema import Direction
 class Test(unittest.TestCase):
     def setUp(self) -> None:
         self.img = cv2.imread("tests/test.jpg")
-        return super().setUp()
-
-    def test_FaceDetection__detect_face(self):
-        gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
-        # url = "http://192.168.0.117:8080/test"
         frame_width, frame_height, _ = self.img.shape
+        # url = "http://192.168.0.117:8080/test"
         config = {
             "send_http":
             False,
@@ -29,12 +32,18 @@ class Test(unittest.TestCase):
             "profile_faceCascade_path":
             "/Users/chencheng/OneDrive/important/大学/授業資料/44情報科学総合演習/code/miraizaka/RaspberryPi/haarcascades/haarcascade_profileface.xml"
         }
-        logging.basicConfig(level=logging.INFO)
-        face_detection = FaceDetection(config=config)
-        res = face_detection._FaceDetection__detect_face(
+        logging.basicConfig(level=logging.DEBUG)
+        self.face_detection = FaceDetection(config=config)
+
+        return super().setUp()
+
+    def test_FaceDetection__detect_face(self):
+        gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
+
+        res = self.face_detection._FaceDetection__detect_face(
             gray,
             Direction.LEFT_FACE,
-            frame_width,
+            self.face_detection.config.frame_width,
         )
 
         print(res)
@@ -51,30 +60,15 @@ class Test(unittest.TestCase):
         )
 
     def test_detect_face(self):
-        # url = "http://192.168.0.117:8080/test"
-        frame_width, frame_height, _ = self.img.shape
-        config = {
-            "send_http":
-            False,
-            "show_window":
-            True,
-            "frame_width":
-            frame_width,
-            "frame_height":
-            frame_height,
-            "profile_faceCascade_path":
-            "/Users/chencheng/OneDrive/important/大学/授業資料/44情報科学総合演習/code/miraizaka/RaspberryPi/haarcascades/haarcascade_profileface.xml"
-        }
-        logging.basicConfig(level=logging.INFO)
-        face_detection = FaceDetection(config=config)
-        res = face_detection.detect_face(
-            self.img, face_detection.config.frame_width,
-            face_detection.config.frame_height, face_detection.offset
+
+        res = self.face_detection.detect_face(
+            self.img, self.face_detection.config.frame_width,
+            self.face_detection.config.frame_height, self.face_detection.offset
         )
 
-        res2 = face_detection.detect_face(
-            self.img, face_detection.config.frame_width,
-            face_detection.config.frame_height, 1
+        res2 = self.face_detection.detect_face(
+            self.img, self.face_detection.config.frame_width,
+            self.face_detection.config.frame_height, 1
         )
 
         print(res)
@@ -105,4 +99,4 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)

@@ -1,3 +1,10 @@
+import os
+import sys
+
+sys.path.append(
+    os.path.abspath(os.path.dirname(os.path.abspath(__file__)) + os.path.sep + "..")
+)
+
 import unittest
 
 from RaspberryPi import main as RasPi

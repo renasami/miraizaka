@@ -1,42 +1,27 @@
+import os
+import sys
+
+sys.path.append(
+    os.path.abspath(os.path.dirname(os.path.abspath(__file__)) + os.path.sep + "..")
+)
+
 import numpy as np
 import cv2
 
-import os
 from datetime import datetime
 import json
 from pydantic import ValidationError
 import requests
 import base64
 
-from ..api.app.schema import Direction, HTTPFace
+from api.app.schema import Direction, HTTPFace
 
-FRAME_WIDTH, FRAME_HEIGHT = 800, 450
-# FRAME_WIDTH, FRAME_HEIGHT = 1280, 720
-SCALE_FACTOR_PROFILE = 2.8
-MIN_NEIGHBORS_PROFILE = 2
-MIN_SIZE_PROFILE = (20, 20)
-OFFSET = 30
+faceCascade_path = \
+    os.path.dirname(os.path.abspath(__file__)) \
+    + \
+    os.path.sep + "haarcascades/haarcascade_profileface.xml"
 
-SHOW_WINDOW = True
-
-SAVE_PIC = True
-SAVE_PIC = False
-
-# SEND_HTTP = False
-SEND_HTTP = True
-
-URL = "http://192.168.0.117:8080/test"
-PATH = "/home/pi/vscoder/image"
-# PATH = "."
-if SAVE_PIC:
-    PATH += "/{date}".format(date=datetime.now().strftime("%Y%m%d%H%M%s"))
-    if not os.path.exists(PATH):
-        os.mkdir(PATH)
-    PATH += "/%s.jpg"
-
-profile_faceCascade = cv2.CascadeClassifier(
-    "miraizaka/RaspberryPi/haarcascades/haarcascade_profileface.xml"
-)
+profile_faceCascade = cv2.CascadeClassifier(faceCascade_path)
 
 
 def get_profile_face(
@@ -129,6 +114,31 @@ def send_face(original_img, url, datetime, profile_faces, frame_width, frame_hei
 
     res = requests.post(url=url, json=data)
     return res.text
+
+
+FRAME_WIDTH, FRAME_HEIGHT = 800, 450
+# FRAME_WIDTH, FRAME_HEIGHT = 1280, 720
+SCALE_FACTOR_PROFILE = 2.8
+MIN_NEIGHBORS_PROFILE = 2
+MIN_SIZE_PROFILE = (20, 20)
+OFFSET = 30
+
+SHOW_WINDOW = True
+
+SAVE_PIC = True
+SAVE_PIC = False
+
+SEND_HTTP = True
+SEND_HTTP = False
+
+URL = "http://192.168.0.117:8080/test"
+PATH = os.path.dirname(os.path.abspath(__file__)) + os.path.sep + "image"
+# PATH = "."
+if SAVE_PIC:
+    PATH += "/{date}".format(date=datetime.now().strftime("%Y%m%d%H%M%s"))
+    if not os.path.exists(PATH):
+        os.mkdir(PATH)
+    PATH += "/%s.jpg"
 
 
 def main(n):
