@@ -1,18 +1,21 @@
 import os
 import sys
 
-sys.path.append(
-    os.path.abspath(os.path.dirname(os.path.abspath(__file__)) + os.path.sep + "..")
+workspace = os.path.abspath(
+    os.path.dirname(os.path.abspath(__file__)) + os.path.sep + ".."
 )
+sys.path.append(workspace)
 
 import unittest
 import logging
+from datetime import datetime
 
 import cv2
 import numpy as np  # noqa
 
-from RaspberryPi.FaceDetection import FaceDetection, FaceBase
+from RaspberryPi.FaceDetection import FaceDetection, FaceBase, UncodedData
 from api.app.schema import Direction
+from utils import performance
 
 
 class Test(unittest.TestCase):
@@ -20,17 +23,13 @@ class Test(unittest.TestCase):
         self.img = cv2.imread("tests/test.jpg")
         frame_width, frame_height, _ = self.img.shape
         # url = "http://192.168.0.117:8080/test"
+        faceCascade_path = workspace + "/RaspberryPi/haarcascades/haarcascade_profileface.xml"
         config = {
-            "send_http":
-            False,
-            "show_window":
-            True,
-            "frame_width":
-            frame_width,
-            "frame_height":
-            frame_height,
-            "profile_faceCascade_path":
-            "/Users/chencheng/OneDrive/important/大学/授業資料/44情報科学総合演習/code/miraizaka/RaspberryPi/haarcascades/haarcascade_profileface.xml"
+            "send_http": False,
+            "show_window": True,
+            "frame_width": frame_width,
+            "frame_height": frame_height,
+            "profile_faceCascade_path": faceCascade_path
         }
         logging.basicConfig(level=logging.DEBUG)
         self.face_detection = FaceDetection(config=config)
@@ -62,13 +61,17 @@ class Test(unittest.TestCase):
     def test_detect_face(self):
 
         res = self.face_detection.detect_face(
-            self.img, self.face_detection.config.frame_width,
-            self.face_detection.config.frame_height, self.face_detection.offset
+            self.img,
+            self.face_detection.config.frame_width,
+            self.face_detection.config.frame_height,
+            self.face_detection.offset,
         )
 
         res2 = self.face_detection.detect_face(
-            self.img, self.face_detection.config.frame_width,
-            self.face_detection.config.frame_height, 1
+            self.img,
+            self.face_detection.config.frame_width,
+            self.face_detection.config.frame_height,
+            1,
         )
 
         print(res)
@@ -96,6 +99,32 @@ class Test(unittest.TestCase):
                 )
             ]
         )
+
+    def test_encode_to_HTTPFace(self):
+
+        uncoded_data = {
+            "datetime":
+            datetime.now(),
+            "img":
+            self.img,
+            "faces":
+            self.face_detection.detect_face(
+                self.img,
+                self.face_detection.config.frame_width,
+                self.face_detection.config.frame_height,
+                self.face_detection.offset,
+            )
+        }
+        data_list = [UncodedData(**uncoded_data)]
+
+        @performance
+        def __test_encode_to_HTTPFace():
+            for _ in range(100):
+                res = self.face_detection.encode_to_HTTPFace(data_list)
+            return res
+
+        res = __test_encode_to_HTTPFace()
+        # print(res[0])
 
 
 if __name__ == "__main__":
