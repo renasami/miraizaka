@@ -117,6 +117,7 @@ def send_face(original_img, url, datetime, profile_faces, frame_width, frame_hei
 
 
 FRAME_WIDTH, FRAME_HEIGHT = 800, 450
+# FRAME_WIDTH, FRAME_HEIGHT = 640, 360
 # FRAME_WIDTH, FRAME_HEIGHT = 1280, 720
 SCALE_FACTOR_PROFILE = 2.8
 MIN_NEIGHBORS_PROFILE = 2
@@ -133,7 +134,7 @@ SEND_HTTP = False
 
 URL = "http://192.168.0.117:8080/test"
 PATH = os.path.dirname(os.path.abspath(__file__)) + os.path.sep + "image"
-# PATH = "."
+
 if SAVE_PIC:
     PATH += "/{date}".format(date=datetime.now().strftime("%Y%m%d%H%M%s"))
     if not os.path.exists(PATH):
@@ -150,6 +151,11 @@ def main(n):
     cap = cv2.VideoCapture(0)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_WIDTH)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT)
+
+    li = ["width", "height", "fps"]
+
+    for i in range(3):
+        print(li[i], cap.get(i + 3))
 
     if SAVE_PIC:
         id = 0
