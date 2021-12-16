@@ -10,7 +10,7 @@ from pydantic.fields import T
 import requests
 import base64
 from pydantic import BaseModel
-from typing import Optional, Union, Tuple, List
+from typing import Any, Optional, Union, Tuple, List
 import logging
 import asyncio
 
@@ -43,7 +43,7 @@ class FaceDetectionConfig(BaseModel):
 
 class UncodedData(BaseModel):
     datetime: datetime
-    img: np.ndarray
+    img: Any
     faces: List[FaceBase]
 
 
@@ -55,11 +55,13 @@ class FaceDetection:
         debug: bool = False,
         config: Union[FaceDetectionConfig, dict] = FaceDetectionConfig(),
     ) -> None:
+
         self.url = url
         self.offset = offset
         self.logger = logging.getLogger("FaceDetection")
         self.logger.setLevel(logging.INFO)
         self.uncoded_data_list: List[UncodedData] = []
+        self.exist_sent_failed_data = False
 
         # configを設定
         if type(config) == dict:
@@ -138,26 +140,6 @@ class FaceDetection:
 
         return faces_obj_list
 
-    def __encode_to_HTTPFace(
-        self,
-        uncoded_data_list: List[UncodedData],
-    ) -> list:
-
-        data = []
-
-        for i in uncoded_data_list:
-            for j in i.faces:
-                roi_color = i.img[j.pos_y:j.pos_y + j.heigth, j.pos_x:j.pos_x + j.width]
-                img_base64 = encode_img_to_base64(roi_color)
-                face_obj = HTTPFace(
-                    **j,
-                    datetime=i.datetime,
-                    img_base64=img_base64,
-                    frame_width=self.config.frame_width,
-                    frame_height=self.config.frame_height,
-                )
-                data.append(json.loads(face_obj.json()))
-
     def detect_face(
         self,
         img,
@@ -185,16 +167,45 @@ class FaceDetection:
 
         return faces
 
-    async def sent_face_http(self, uncoded_data_list: List[UncodedData]):
-        data = self.__encode_to_HTTPFace(uncoded_data_list)
+    def encode_to_HTTPFace(
+        self,
+        uncoded_data_list: List[UncodedData],
+    ) -> list:
+
+        data = []
+
+        for i in uncoded_data_list:
+            for j in i.faces:
+                roi_color = i.img[j.pos_y:j.pos_y + j.heigth, j.pos_x:j.pos_x + j.width]
+                img_base64 = encode_img_to_base64(roi_color)
+                face_obj = HTTPFace(
+                    **j.dict(),
+                    datetime=i.datetime,
+                    img_base64=img_base64,
+                    frame_width=self.config.frame_width,
+                    frame_height=self.config.frame_height,
+                )
+                data.append(json.loads(face_obj.json()))
+
+        return data
+
+    async def sent_face_http(self, http_face_json: list):
         loop = asyncio.get_event_loop()
-        future = loop.run_in_executor(None, requests.post, url=url, json=data)
+        future = loop.run_in_executor(None, requests.post, url=url, json=http_face_json)
 
         res = await future
-        如果没成功的处理
+
+        if not res.ok:
+            self.write(http_face_json)
+        elif self.exist_sent_failed_data:
+            self.read_http_face_json()
+            self.sent_face_http()
         return res
 
-    def write(self):
+    def write_http_face_json(self, path, http_face: List[HTTPFace]):
+        ...
+
+    def read_http_face_json(self, path):
         ...
 
     def show_window(self) -> None:
@@ -215,6 +226,7 @@ if __name__ == "__main__":
         "profile_faceCascade_path":
         "miraizaka/RaspberryPi/haarcascades/haarcascade_profileface.xml"
     }
+
     logging.basicConfig(level=logging.INFO)
     face_detection = FaceDetection(config=config)
     print(face_detection.config.send_http)
