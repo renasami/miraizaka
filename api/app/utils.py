@@ -6,7 +6,7 @@ import base64
 
 def encode_img_to_base64(img):
     _, encing = cv2.imencode(".jpg", img)
-    return base64.b64encode(encing.tostring()).decode("utf-8")
+    return base64.b64encode(encing.tobytes()).decode("utf-8")
 
 
 def decode_img_base64(img_base64):
