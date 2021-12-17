@@ -11,11 +11,11 @@ services:
     volumes:
       - ./api/app:/app
   
-  machine_learn:
-    build: 
-      context: .
-      dockerfile: ./machine_learn/Dockerfile
-    ports: 
-      - 5000:8888
-    volumes:
-      - ./machine_learn:/machine_learn
+  # machine_learn:
+  #   build: 
+  #     context: .
+  #     dockerfile: ./machine_learn/Dockerfile
+  #   ports: 
+  #     - 5000:8888
+  #   volumes:
+  #     - ./machine_learn:/machine_learn
