@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Union, Tuple, List
+from typing import Any, Optional, Union, Tuple, List
+from datetime import datetime
 
-from schema import RGB_ndarray_img, FaceBase, EntryExitRawDBCreate, EntryExitRaw
+from schema import RGB_ndarray_img, FaceBase, EntryExitRawDBCreate, EntryExitRaw, EntryExitBase
 
 
-class BaceCamera(ABC):
+class BaseCamera(ABC):
     @property
     @abstractmethod
     def frame_width(self):
@@ -20,28 +21,40 @@ class BaceCamera(ABC):
         pass
 
 
-class BaceFaceDetection(ABC):
+class BaseFaceDetection(ABC):
+    @property
     @abstractmethod
-    def detect_face(
-        self,
-        img: RGB_ndarray_img,
-        resolution_zoom: Optional[float] = None,
-        detection_range_zoom: Optional[Tuple[int, ...]] = None,
-    ) -> List[FaceBase]:
+    def resolution_zoom(self) -> Optional[float]:
         """
-        画像内の顔の境界ボックスとを返す, この時点でわかる場合顔の方向も返す。\n\n
-
         :param resolution_zoom: (0,1]の範囲で元画像の解像度を圧縮する。数字が小さいほど処理が軽い。\n
+        """
+
+        # detect_faceはこのプロパティを使って実現するべき
+        pass
+
+    @property
+    @abstractmethod
+    def detection_range_zoom(self) -> Optional[Tuple[int, ...]]:
+        """
         :param detection_range_offset: 境界ボックスを拡大あるいは縮小する。\n
         値が 1 つ場合、全四辺に同じ値でズームする。\n
         値が 2 つ場合、1 つ目は上下、2 つ目は左右に適用される。\n
         値が 3 つ場合、1 つ目は上、2 つ目は左右、3 つ目は下の辺に適用される。\n
         値が 4 つ場合、それぞれ上、右、下、左の順 (時計回り) に適用される。\n
         """
+
+        # detect_faceはこのプロパティを使って実現するべき
+        pass
+
+    @abstractmethod
+    def detect_face(self, img: RGB_ndarray_img) -> List[FaceBase]:
+        """
+        画像内の顔の境界ボックスとを返す。この時点でわかる場合、顔の方向も返す。
+        """
         pass
 
 
-class BaceFaceIdentification(ABC):
+class BaseFaceIdentification(ABC):
     @property
     @abstractmethod
     def model(self):
@@ -60,17 +73,34 @@ class BaceFaceIdentification(ABC):
         """
         pass
 
-
-class BaceEntryExitJudgement(ABC):
     @abstractmethod
-    def jzudge_entry_exit(
+    def identify_face_base_list(
         self,
-        entry_exit_raw_list: List[EntryExitRaw],
-    ) -> List[EntryExitRawDBCreate]:
+        frame: RGB_ndarray_img,
+        time: datetime,
+        face_list: List[FaceBase],
+        frame_width: int,
+        frame_height: int,
+    ) -> List[EntryExitRaw]:
+        """
+        顔を認識し、データを整形します（次にステップに使えるように）
+        """
         pass
 
 
-class BaceEntryExitIO(ABC):
+class BaseEntryExitJudgement(ABC):
+    @abstractmethod
+    def judge_entry_exit(
+        self,
+        entry_exit_raw_list: List[EntryExitRaw],
+    ) -> List[EntryExitBase]:
+        """
+        一連のEntryExitRawデータから、誰がいつ入室/退室したかを返す。
+        """
+        pass
+
+
+class BaseEntryExitIO(ABC):
     @property
     @abstractmethod
     def raw_db_path(self):
@@ -82,11 +112,21 @@ class BaceEntryExitIO(ABC):
         pass
 
     @abstractmethod
-    def save_entry_exit_raw(self, entry_exit_db: EntryExitRawDBCreate):
+    def save_entry_exit_raw(self, entry_exit_db: EntryExitRawDBCreate) -> Any:
+        """
+        EntryExitRaw（ローデータ）をraw_db_pathに保存する。
+        """
+
+        # ローカルファイルに保存するか、データベースに保存するかは自由
         pass
 
     @abstractmethod
-    def save_entry_exit(self, entry_exit_db_list: List[EntryExitRawDBCreate]):
+    def save_entry_exit(self, entry_exit_db_list: List[EntryExitBase]) -> Any:
+        """
+        EntryExitBase（入退室情報）をdb_pathに保存する。
+        """
+
+        # ローカルファイルに保存するか、データベースに保存するかは自由
         pass
 
     @abstractmethod
