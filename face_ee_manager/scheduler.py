@@ -69,7 +69,7 @@ class Scheduler:
 
         # async_loop用プロパティ
         if trigger is None:
-            self._trigger = self._build_in_trigger
+            trigger = self._build_in_trigger
         elif not callable(trigger):
             raise TypeError(err_msg.type % ("Callable", type(trigger)))
         self._trigger = trigger
