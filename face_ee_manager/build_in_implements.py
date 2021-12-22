@@ -92,6 +92,7 @@ class FaceRecogDetection(BaseFaceDetection):
         self._range_zoom = val
 
     def detect_face(self, img: RGB_ndarray_img) -> List[FaceBase]:
+        height, width, _ = img.shape
         if self.resolution_zoom:
             r_z = self.resolution_zoom
             img = cv2.resize(img, (0, 0), fx=r_z, fy=r_z)  # yapf: disable
@@ -99,7 +100,6 @@ class FaceRecogDetection(BaseFaceDetection):
         face_locations = face_recognition.face_locations(img)
 
         face_list = []
-        height, width, _ = img.shape
         for (top, right, bottom, left) in face_locations:
 
             if self.resolution_zoom:
