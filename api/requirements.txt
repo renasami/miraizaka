@@ -11,3 +11,4 @@ SQLAlchemy_Utils
 PyYAML
 
 opencv-python
+face_recognition
