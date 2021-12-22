@@ -14,12 +14,12 @@ import cv2
 import numpy as np  # noqa
 
 from RaspberryPi.FaceDetection import FaceDetection, FaceBase, UncodedData
-from api.app.schema import Direction
-from utils import performance
+from face_ee_manager.schema import Direction
 
 
 class Test(unittest.TestCase):
-    def setUp(self) -> None:
+    @classmethod
+    def setUpClass(self) -> None:
         self.img = cv2.imread("tests/test.jpg")
         frame_width, frame_height, _ = self.img.shape
         # url = "http://192.168.0.117:8080/test"
@@ -34,7 +34,15 @@ class Test(unittest.TestCase):
         logging.basicConfig(level=logging.DEBUG)
         self.face_detection = FaceDetection(config=config)
 
-        return super().setUp()
+    def setUp(self):
+        meg = f"---{self._testMethodName}---"
+        print(meg, end="")
+        print("-" * (70 - len(meg)))
+        self.time_begin = datetime.now()
+
+    def tearDown(self):
+        t = datetime.now() - self.time_begin
+        print(f"\nin: {t.total_seconds():.3f}s", end="\n\n\n")
 
     def test_FaceDetection__detect_face(self):
         gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
@@ -45,7 +53,7 @@ class Test(unittest.TestCase):
             self.face_detection.config.frame_width,
         )
 
-        print(res)
+        # print(res)
         self.assertEqual(
             res, [
                 FaceBase(
@@ -74,8 +82,8 @@ class Test(unittest.TestCase):
             1,
         )
 
-        print(res)
-        print(res2)
+        # print(res)
+        # print(res2)
         self.assertEqual(
             res, [
                 FaceBase(
@@ -117,7 +125,6 @@ class Test(unittest.TestCase):
         }
         data_list = [UncodedData(**uncoded_data)]
 
-        @performance
         def __test_encode_to_HTTPFace():
             for _ in range(100):
                 res = self.face_detection.encode_to_HTTPFace(data_list)
@@ -125,7 +132,8 @@ class Test(unittest.TestCase):
 
         res = __test_encode_to_HTTPFace()
         # print(res[0])
+        return res
 
 
 if __name__ == "__main__":
-    unittest.main(verbosity=2)
+    unittest.main(verbosity=0)
