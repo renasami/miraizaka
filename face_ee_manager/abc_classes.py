@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Optional, Union, Tuple, List
 from datetime import datetime
 
-from schema import RGB_ndarray_img, FaceBase, EntryExitRawDBCreate, EntryExitRaw, EntryExitBase
+from .schema import RGB_ndarray_img, FaceBase, EntryExitRawDBCreate, EntryExitRaw, EntryExitBase
 
 
 class BaseCamera(ABC):
@@ -17,7 +17,7 @@ class BaseCamera(ABC):
         pass
 
     @abstractmethod
-    def get_flame(self) -> Tuple[RGB_ndarray_img, ...]:
+    def get_flame(self) -> Tuple[Optional[RGB_ndarray_img], ...]:
         pass
 
 
@@ -34,9 +34,9 @@ class BaseFaceDetection(ABC):
 
     @property
     @abstractmethod
-    def detection_range_zoom(self) -> Optional[Tuple[int, ...]]:
+    def range_zoom(self) -> Optional[Tuple[int, ...]]:
         """
-        :param detection_range_offset: 境界ボックスを拡大あるいは縮小する。\n
+        :param range_zoom: FaceBaseの顔の境界ボックスを拡大あるいは縮小する。\n
         値が 1 つ場合、全四辺に同じ値でズームする。\n
         値が 2 つ場合、1 つ目は上下、2 つ目は左右に適用される。\n
         値が 3 つ場合、1 つ目は上、2 つ目は左右、3 つ目は下の辺に適用される。\n
@@ -121,7 +121,7 @@ class BaseEntryExitIO(ABC):
         pass
 
     @abstractmethod
-    def save_entry_exit(self, entry_exit_db_list: List[EntryExitBase]) -> Any:
+    def save_entry_exit(self, entry_exit_db_list: EntryExitBase) -> Any:
         """
         EntryExitBase（入退室情報）をdb_pathに保存する。
         """

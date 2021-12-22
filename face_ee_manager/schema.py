@@ -18,18 +18,19 @@ class EntryOrExit(Enum):
     EXIT = 1
 
 
+# ！！重要データ構造
 class FaceBase(BaseModel):
     top: int
     right: int
     bottom: int
     left: int
-    direction: Optional[Direction]
+    direction: Optional[Direction] = None
+    frame_width: int
+    frame_height: int
 
 
 class FaceSchema(FaceBase):
     datetime: datetime
-    frame_width: int
-    frame_height: int
 
 
 class HTTPFace(FaceSchema):
@@ -40,6 +41,7 @@ class EntryExitRawBase(FaceSchema):
     identification: Union[int, str]
 
 
+# ！！重要データ構造
 class EntryExitRaw(EntryExitRawBase):
     pass
 
@@ -52,6 +54,7 @@ class EntryExitRawDBCreate(EntryExitInRawDB):
     pass
 
 
+# ！！重要データ構造
 class EntryExitBase(BaseModel):
     datetime: datetime
     identify_id: Union[int, str]
@@ -66,6 +69,11 @@ class FaceDetectPrama(BaseModel):
     scaleFactor: float
     minNeighbors: int
     minSize: Tuple[int, int]
+
+
+class SchedulerConfig(BaseModel):
+    motion_done_after_sec: int = 5
+    trigger_rate: int = 3
 
 
 class FaceDetectionConfig(BaseModel):
