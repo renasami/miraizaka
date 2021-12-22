@@ -36,6 +36,7 @@ camera = [None, "tests/testcase1.mp4"]
 class Test(unittest.TestCase):
     @classmethod
     def setUpClass(self) -> None:
+        print("===================================================")
         logging.basicConfig(level=logging.DEBUG)
 
     def setUp(self):
