@@ -3,6 +3,7 @@ tenacity
 python-jose[cryptography]
 passlib[bcrypt]
 python-multipart
+requests
 
 pymysql
 SQLAlchemy
@@ -11,4 +12,4 @@ SQLAlchemy_Utils
 PyYAML
 
 opencv-python
-face_recognition
+# face_recognition
