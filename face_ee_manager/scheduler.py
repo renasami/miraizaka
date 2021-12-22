@@ -1,9 +1,10 @@
 import asyncio
 from datetime import datetime
-
 from typing import List, Callable, Optional
 from copy import deepcopy
 import logging
+
+import cv2
 
 from .abc_classes import BaseCamera, BaseFaceDetection, BaseFaceIdentification, BaseEntryExitIO, BaseEntryExitJudgement
 from .schema import RGB_ndarray_img, FaceBase, EntryExitRaw, EntryExitRawDBCreate, SchedulerConfig
@@ -239,6 +240,11 @@ class Scheduler:
 
             # 動きが終わるまで一旦保存
             ee_raw_list += ee_raw_list
+
+            for face in face_list:
+                cv2.rectangle(frame[:, :, ::-1], (face.left, face.top), (face.right, face.bottom), (0, 0, 255), 2)
+            cv2.imshow('Video', frame[:, :, ::-1])
+            cv2.waitKey(0)
 
             passed_time = (datetime.now() - last_detected_time).total_seconds()
             if passed_time > self.config.motion_done_after_sec and ee_raw_list:
