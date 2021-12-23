@@ -1,19 +1,15 @@
 from fastapi import FastAPI, UploadFile, status, File
 from fastapi.responses import JSONResponse
-# import requests
-# import cv2
+import cv2
 # import numpy as np
 
 from typing import List
-import base64
+# import base64
 from keys import NOTIFY
 import requests
 
-from app.schema import HTTPFace
-
-from starlette.responses import FileResponse
-from models import FaceSchema
-
+from face_ee_manager.schema import HTTPFace
+from face_ee_manager import decode_img
 
 app = FastAPI()
 
@@ -36,21 +32,22 @@ def test_post(x, y, w, h, cw, ch, file: UploadFile = File(...)):
 
     return JSONResponse(content=file.filename, status_code=status.HTTP_200_OK)
 
+
 @app.post("/notify")
-def notify(state:int):
+def notify(state: int):
     message = ""
-    if state > 0:message = "入室" 
-    else:message = "退出"
+    if state > 0: message = "入室"
+    else: message = "退出"
     headers = {
         'Authorization': NOTIFY,
     }
     files = {
-        'message': (None,message ),
+        'message': (None, message),
     }
-    response = requests.post('https://notify-api.line.me/api/notify', headers=headers, files=files)
+    response = requests.post(
+        'https://notify-api.line.me/api/notify', headers=headers, files=files
+    )
     return response.status_code
-
-        
 
 
 @app.post("/test")
@@ -60,6 +57,7 @@ def test_p(face_list: List[HTTPFace]):
         size_li.append({"file_size": len(i.img_base64)})
         print(len(i.img_base64))
         print(type(i.img_base64))
-        img = cv2.imdecode(np.fromstring(base64.b64decode(i.img_base64), dtype="uint8"), 1)
-        cv2.imwrite("/app/test.jpg", img)
+        img = decode_img(i.img_base64)
+        img = img[:, :, ::-1]
+        cv2.imwrite("/app/test1.jpg", img)
     return JSONResponse(content=size_li, status_code=status.HTTP_200_OK)

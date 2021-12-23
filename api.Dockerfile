@@ -6,6 +6,7 @@ ENV PYTHONPATH=/
 
 # pip installs
 COPY ./api/app /app
+COPY ./face_ee_manager /app/face_ee_manager
 COPY ./api/requirements.txt requirements.txt
 RUN apt-get update && apt-get upgrade -y
 RUN /usr/local/bin/python -m pip install --upgrade pip
