@@ -9,10 +9,9 @@ from keys import NOTIFY
 import requests
 
 from face_ee_manager.schema import HTTPFace
-from face_ee_manager import EntryExitIO
+from face_ee_manager import decode_img
 
 app = FastAPI()
-eeio = EntryExitIO()
 
 
 @app.get("/")
@@ -58,7 +57,7 @@ def test_p(face_list: List[HTTPFace]):
         size_li.append({"file_size": len(i.img_base64)})
         print(len(i.img_base64))
         print(type(i.img_base64))
-        img = eeio.decode_img(i.img_base64)
+        img = decode_img(i.img_base64)
         img = img[:, :, ::-1]
         cv2.imwrite("/app/test1.jpg", img)
     return JSONResponse(content=size_li, status_code=status.HTTP_200_OK)
