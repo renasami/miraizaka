@@ -6,28 +6,19 @@ sys.path.append(
     os.path.abspath(os.path.dirname(os.path.abspath(__file__)) + os.path.sep + "..")
 )
 
-import numpy as np
-import cv2
-
-from datetime import datetime
 import json
-from pydantic import ValidationError
 import requests
 import logging
-import base64
 
-from face_ee_manager import Cv2Camera, EntryExitIO, FaceRecogDetection, Scheduler
+from face_ee_manager import Cv2Camera, EntryExitIO, FaceRecogDetection, Scheduler, encode_img
 from face_ee_manager.schema import FaceBase, HTTPFace
 
 http_face_url = "http://192.168.0.117:8080/test"
 
-eeio = EntryExitIO()
-
 
 def send_face(**kwargs):
     global http_face_url
-    if kwargs["called_func"] != "__scheduled_identify_face":
-        return
+    if kwargs["called_func"] != "__scheduled_identify_face": return
 
     frame = kwargs["frame"]
     time = kwargs["time"]
@@ -37,7 +28,7 @@ def send_face(**kwargs):
     for face in face_list:
         face_img = frame[face.top:face.bottom, face.left:face.right]
 
-        img_base64 = eeio.encode_img(face_img)
+        img_base64 = encode_img(face_img)
         http_face = HTTPFace(
             **face.dict(),
             datetime=time,
@@ -51,6 +42,7 @@ def send_face(**kwargs):
 
 
 cam = Cv2Camera()
+eeio = EntryExitIO()
 f_d = FaceRecogDetection()
 scheduler = Scheduler(
     camera_obj=cam,
