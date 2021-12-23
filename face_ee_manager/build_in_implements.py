@@ -21,8 +21,7 @@ class Cv2Camera(BaseCamera):
         frame_height: int = 720,
         fps: int = 30
     ) -> None:
-        if path:
-            self.cam = cv2.VideoCapture(path)
+        if path: self.cam = cv2.VideoCapture(path)
         else:
             self.cam = cv2.VideoCapture(device_id)
             self.cam.set(cv2.CAP_PROP_FRAME_WIDTH, frame_width)
@@ -43,8 +42,7 @@ class Cv2Camera(BaseCamera):
 
     def get_flame(self) -> Tuple[RGB_ndarray_img, ...]:
         ret, frame = self.cam.read()
-        if frame is not None:
-            frame = frame[:, :, ::-1]
+        if frame is not None: frame = frame[:, :, ::-1]
         return frame, ret
 
 
@@ -57,6 +55,7 @@ class FaceRecogDetection(BaseFaceDetection):
 
         if resolution_zoom is not None and not (0 < resolution_zoom <= 1):
             raise ValueError(err_msg.rz_value)
+
         self._resolution_zoom = resolution_zoom
         self.range_zoom = range_zoom
 

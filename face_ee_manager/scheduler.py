@@ -43,12 +43,9 @@ class Scheduler:
             self.logger.setLevel(logging.DEBUG)
             logging.getLogger("asyncio").setLevel(logging.DEBUG)
 
-        if type(config) == dict:
-            self.config = SchedulerConfig(**config)
-        elif isinstance(config, SchedulerConfig):
-            self.config = config
-        else:
-            raise TypeError(err_msg.type % ("SchedulerConfig", type(config)))
+        if type(config) == dict: self.config = SchedulerConfig(**config)
+        elif isinstance(config, SchedulerConfig): self.config = config
+        else: raise TypeError(err_msg.type % ("SchedulerConfig", type(config)))
 
         # 処理系obj、関数
         if not callable(callback):
@@ -68,10 +65,10 @@ class Scheduler:
         self.ee_judge = entry_exit_judgement_obj
 
         # async_loop用プロパティ
-        if trigger is None:
-            trigger = self._build_in_trigger
+        if trigger is None: trigger = self._build_in_trigger
         elif not callable(trigger):
             raise TypeError(err_msg.type % ("Callable", type(trigger)))
+
         self._trigger = trigger
         self.trigger_flag = False
 
@@ -140,8 +137,7 @@ class Scheduler:
     async def __process(self, unprocessed_frame_list):
         all_ee_raw_list = []
         for frame, time_now in unprocessed_frame_list:
-            if self.trigger_flag:
-                await asyncio.sleep(5)
+            if self.trigger_flag: await asyncio.sleep(5)
 
             # 顔検出
             face_list = self.__scheduled_detect_face(frame)
@@ -153,8 +149,7 @@ class Scheduler:
             # 顔識別
             param = (frame, time_now, face_list)
             ee_raw_list = self.__scheduled_identify_face(*param)
-            if ee_raw_list:
-                self.logger.debug("ee_raw_list: " + str(ee_raw_list))
+            if ee_raw_list: self.logger.debug("ee_raw_list: " + str(ee_raw_list))
             all_ee_raw_list += ee_raw_list
             await asyncio.sleep(0.001)
 
@@ -216,8 +211,7 @@ class Scheduler:
 
         while True:
             frame = self.cam.get_flame()[0]
-            if frame is None:
-                break
+            if frame is None: break
             time_now = datetime.now()
 
             face_list = self.__scheduled_detect_face(frame)
@@ -228,8 +222,7 @@ class Scheduler:
 
             param = (frame, time_now, face_list)
             ee_raw_list = self.__scheduled_identify_face(*param)
-            if ee_raw_list:
-                self.logger.debug("ee_raw_list: " + str(ee_raw_list))
+            if ee_raw_list: self.logger.debug("ee_raw_list: " + str(ee_raw_list))
 
             # 保存raw
             for ee_raw in ee_raw_list:
@@ -241,9 +234,10 @@ class Scheduler:
             # 動きが終わるまで一旦保存
             ee_raw_list += ee_raw_list
 
-            for face in face_list:
-                cv2.rectangle(frame[:, :, ::-1], (face.left, face.top), (face.right, face.bottom), (0, 0, 255), 2)
-            cv2.imshow('Video', frame[:, :, ::-1])
+            for f in face_list:
+                img = frame[:, :, ::-1]
+                cv2.rectangle(img, (f.left, f.top), (f.right, f.bottom), (0, 0, 255), 2)
+            cv2.imshow('Video', img)
             cv2.waitKey(0)
 
             passed_time = (datetime.now() - last_detected_time).total_seconds()
@@ -261,10 +255,8 @@ class Scheduler:
             self.logger.info("`loop_func`はNone、デフォルトのloop_funcを使用する")
 
         self.logger.info("`mode=%s`で処理開始......" % mode)
-        if mode == "async":
-            asyncio.run(loop_func(), debug=self.debug)
-        elif mode == "sync":
-            loop_func()
+        if mode == "async": asyncio.run(loop_func(), debug=self.debug)
+        elif mode == "sync": loop_func()
 
 
 # for ee_rew in ee_raw_list:
