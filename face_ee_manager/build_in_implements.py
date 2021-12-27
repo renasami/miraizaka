@@ -1,15 +1,38 @@
-from typing import Optional, Tuple, List, Any
 import base64
+from typing import Optional, Tuple, List, Any
 
 import cv2
 import numpy as np
-import face_recognition
 
-from .abc_classes import BaseCamera, BaseFaceDetection, BaseEntryExitIO
-from .schema import RGB_ndarray_img, FaceBase, EntryExitRawDBCreate, EntryExitBase
+try:
+    import face_recognition
+except Exception:
+    pass
+
+from .abc_classes import BaseCamera, BaseFaceDetection, BaseEntryExitIO, BaseFaceIdentification, BaseEntryExitJudgement
+from .schema import RGB_ndarray_img, FaceBase, EntryExitRawDBCreate, EntryExit
 from . import message
 
 err_msg = message.err
+
+
+def make_diff_trigger():
+    last_img = None
+
+    def trigger(img):
+        nonlocal last_img
+        if last_img is None:
+            last_img = img
+            return False
+
+        abs_im_diff = img.astype(int) - last_img.astype(int)
+        if abs_im_diff.max() > 20:
+            last_img = img
+            return True
+        else:
+            return False
+
+    return trigger
 
 
 class Cv2Camera(BaseCamera):
@@ -142,7 +165,7 @@ class EntryExitIO(BaseEntryExitIO):
     def save_entry_exit_raw(self, entry_exit_db: EntryExitRawDBCreate) -> Any:
         pass
 
-    def save_entry_exit(self, entry_exit_db_list: List[EntryExitBase]) -> Any:
+    def save_entry_exit(self, entry_exit_db_list: List[EntryExit]) -> Any:
         pass
 
     def encode_img(self, img) -> str:
@@ -151,3 +174,24 @@ class EntryExitIO(BaseEntryExitIO):
 
     def decode_img(self, str) -> RGB_ndarray_img:
         return cv2.imdecode(np.fromstring(base64.b64decode(str), dtype="uint8"), 1)
+
+
+class FaceIdentification(BaseFaceIdentification):
+    @property
+    def model(self):
+        pass
+
+    @model.setter
+    def model(self, val):
+        pass
+
+    def identify_face(self, face_img: RGB_ndarray_img):
+        pass
+
+
+class EntryExitJudgement(BaseEntryExitJudgement):
+    def judge_entry_exit(
+        self,
+        entry_exit_raw_list,
+    ) -> List[EntryExit]:
+        pass

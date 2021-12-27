@@ -1,4 +1,4 @@
-from .build_in_implements import Cv2Camera, FaceRecogDetection, EntryExitIO  # noqa
+from .build_in_implements import Cv2Camera, FaceRecogDetection, EntryExitIO, FaceIdentification, EntryExitJudgement, make_diff_trigger  # noqa
 from .scheduler import Scheduler  # noqa
 from .schema import *
 
