@@ -1,8 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional, Union, Tuple, List
-from datetime import datetime
 
-from .schema import RGB_ndarray_img, FaceBase, EntryExitRawDBCreate, EntryExitRaw, EntryExitBase
+from .schema import RGB_ndarray_img, FaceBase, EntryExitRawDBCreate, EntryExitRaw, EntryExit
 
 
 class BaseCamera(ABC):
@@ -73,27 +72,13 @@ class BaseFaceIdentification(ABC):
         """
         pass
 
-    @abstractmethod
-    def identify_face_base_list(
-        self,
-        frame: RGB_ndarray_img,
-        time: datetime,
-        face_list: List[FaceBase],
-        frame_width: int,
-        frame_height: int,
-    ) -> List[EntryExitRaw]:
-        """
-        顔を認識し、データを整形します（次にステップに使えるように）
-        """
-        pass
-
 
 class BaseEntryExitJudgement(ABC):
     @abstractmethod
     def judge_entry_exit(
         self,
         entry_exit_raw_list: List[EntryExitRaw],
-    ) -> List[EntryExitBase]:
+    ) -> List[EntryExit]:
         """
         一連のEntryExitRawデータから、誰がいつ入室/退室したかを返す。
         """
@@ -121,7 +106,7 @@ class BaseEntryExitIO(ABC):
         pass
 
     @abstractmethod
-    def save_entry_exit(self, entry_exit_db_list: EntryExitBase) -> Any:
+    def save_entry_exit(self, entry_exit_db_list: EntryExit) -> Any:
         """
         EntryExitBase（入退室情報）をdb_pathに保存する。
         """
