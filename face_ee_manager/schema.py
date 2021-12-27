@@ -78,7 +78,6 @@ class FaceDetectPrama(BaseModel):
 class SchedulerConfig(BaseModel):
     motion_done_after_sec: int = 5
     trigger_rate: int = 3
-    max_send_frames: int = 20
 
 
 class FaceDetectionConfig(BaseModel):
