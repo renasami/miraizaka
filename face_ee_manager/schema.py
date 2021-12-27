@@ -61,6 +61,10 @@ class EntryExitBase(BaseModel):
     entry_or_exit: EntryOrExit
 
 
+class EntryExit(EntryExitBase):
+    pass
+
+
 class EntryExitDBCreate(EntryExitBase):
     identify_id: int
 
@@ -74,6 +78,7 @@ class FaceDetectPrama(BaseModel):
 class SchedulerConfig(BaseModel):
     motion_done_after_sec: int = 5
     trigger_rate: int = 3
+    max_send_frames: int = 20
 
 
 class FaceDetectionConfig(BaseModel):
