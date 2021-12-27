@@ -10,51 +10,66 @@ import json
 import requests
 import logging
 
-from face_ee_manager import Cv2Camera, EntryExitIO, FaceRecogDetection, Scheduler, encode_img
+from face_ee_manager import Cv2Camera, EntryExitIO, FaceRecogDetection, Scheduler, encode_img, make_diff_trigger, FaceIdentification, EntryExitJudgement
 from face_ee_manager.schema import FaceBase, HTTPFace
 
-http_face_url = "http://192.168.0.117:8080/test"
+http_face_url = "http://localhost:8080/test"
 
 
-def send_face(**kwargs):
-    global http_face_url
-    if kwargs["called_func"] != "__scheduled_identify_face": return
+class EntryExitIO(EntryExitIO):
+    def __init__(self) -> None:
+        super().__init__()
+        self.data = []
 
-    frame = kwargs["frame"]
-    time = kwargs["time"]
-    face_list: List[FaceBase] = kwargs["face_list"]
+    def send_face_list(
+        self,
+        face_list: List[FaceBase],
+        time_now,
+        frame,
+        frame_index,
+        frame_len,
+    ):
+        max_send_frames = 20
+        for face in face_list:
+            face_img = frame[face.top:face.bottom, face.left:face.right]
 
-    data = []
-    for face in face_list:
-        face_img = frame[face.top:face.bottom, face.left:face.right]
+            img_base64 = encode_img(face_img)
+            http_face = HTTPFace(
+                **face.dict(),
+                datetime=time_now,
+                img_base64=img_base64,
+            )
 
-        img_base64 = encode_img(face_img)
-        http_face = HTTPFace(
-            **face.dict(),
-            datetime=time,
-            img_base64=img_base64,
-        )
+            self.data.append(json.loads(http_face.json()))
 
-        data.append(json.loads(http_face.json()))
+        j = {
+            "index": frame_index // max_send_frames + 1,
+            "total": (frame_len - 1) // max_send_frames + 1,
+            "data": self.data,
+        }
 
-    res = requests.post(url=http_face_url, json=data)
-    return res.text
+        if (frame_index + 1) % max_send_frames == 0:
+            res = requests.post(url=http_face_url, json=j)
+        elif (frame_len - 1) == frame_index:
+            res = requests.post(url=http_face_url, json=j)
+
+        if res.ok:
+            self.data = []
 
 
-cam = Cv2Camera()
-eeio = EntryExitIO()
-f_d = FaceRecogDetection()
 scheduler = Scheduler(
-    camera_obj=cam,
-    entry_exit_io_obj=eeio,
-    face_detection_obj=f_d,
-    callback=send_face,
+    camera_obj=Cv2Camera(),
+    entry_exit_io_obj=EntryExitIO(),
+    face_detection_obj=FaceRecogDetection(),
+    face_identification_obj=FaceIdentification(),
+    entry_exit_judgement_obj=EntryExitJudgement(),
+    trigger=make_diff_trigger(),
     debug=True
 )
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    scheduler.start(mode="sync")
+    scheduler.start(mode="async")
 
 # faceCascade_path = \
 #     os.path.dirname(os.path.abspath(__file__)) \

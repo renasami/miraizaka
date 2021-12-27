@@ -100,7 +100,8 @@ class Scheduler:
 
     async def __process(self, unprocessed_frame_list):
         all_ee_raw_list = []
-        for frame, time_now in unprocessed_frame_list:
+        ufl = unprocessed_frame_list
+        for (frame, time_now), frame_index in zip(ufl, range(len(ufl))):
             if self.trigger_flag: await asyncio.sleep(5)
 
             # 顔検出
@@ -109,6 +110,9 @@ class Scheduler:
                 self.logger.info("%d人が検出されました" % len(face_list))
                 self.logger.debug("face_list: " + str(face_list))
             await asyncio.sleep(0.001)
+
+            if hasattr(self.eeio, "send_face_list"):
+                self.eeio.send_face_list(face_list, time_now, frame, frame_index, len(ufl))  # yapf: disable
 
             # 顔識別
             param = (frame, time_now, face_list)
