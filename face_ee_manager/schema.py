@@ -61,6 +61,10 @@ class EntryExitBase(BaseModel):
     entry_or_exit: EntryOrExit
 
 
+class EntryExit(EntryExitBase):
+    pass
+
+
 class EntryExitDBCreate(EntryExitBase):
     identify_id: int
 
