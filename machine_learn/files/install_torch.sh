@@ -2,7 +2,7 @@
 
 cd $(dirname $0) || exit 1
 
-CUDA_TARGETS="torch==1.9.0
+CUDA_TARGETS="torch==1.10.0
 torchvision==0.10.0"
 TARGETS="torchaudio==0.9.0"
 
