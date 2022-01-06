@@ -1,17 +1,16 @@
 from fastapi import FastAPI, UploadFile, status, File
 from fastapi.responses import JSONResponse
-import cv2
-# import numpy as np
+import cv2  # noqa
+import numpy as np  # noqa
 
 from typing import List
-# import base64
-from keys import NOTIFY
 import requests
 
 from face_ee_manager.schema import HTTPFace
-from face_ee_manager import decode_img
+from face_ee_manager import decode_img  # noqa
+from app import config
 
-app = FastAPI()
+app = FastAPI(title=config.PROJECT_NAME)
 
 
 @app.get("/")
@@ -39,7 +38,7 @@ def notify(state: int):
     if state > 0: message = "入室"
     else: message = "退出"
     headers = {
-        'Authorization': NOTIFY,
+        'Authorization': config.NOTIFY,
     }
     files = {
         'message': (None, message),
