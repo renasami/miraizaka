@@ -53,6 +53,7 @@ class BaseFaceDetection(ABC):
         pass
 
 
+#model = vgg16のモデル
 class BaseFaceIdentification(ABC):
     @property
     @abstractmethod

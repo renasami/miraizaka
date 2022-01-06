@@ -61,3 +61,8 @@ def test_p(face_list: List[HTTPFace]):
         img = img[:, :, ::-1]
         cv2.imwrite("/app/test1.jpg", img)
     return JSONResponse(content=size_li, status_code=status.HTTP_200_OK)
+
+
+@app.post("/recognize")
+def recognize():
+    return 1
