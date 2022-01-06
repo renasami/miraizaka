@@ -37,7 +37,6 @@ img = ImageFolder(
       transforms.ToTensor()]    
 ))
 
-img_class = [str(n) for n in range(20)]
 
 train, test = train_test_split(img, test_size=0.3)
 
