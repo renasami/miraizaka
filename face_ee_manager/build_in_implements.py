@@ -195,3 +195,16 @@ class EntryExitJudgement(BaseEntryExitJudgement):
         entry_exit_raw_list,
     ) -> List[EntryExit]:
         pass
+
+
+class TorchFaceRecognition(BaseFaceIdentification):
+    @property
+    def model(self):
+        pass
+
+    @model.setter
+    def model(self, val):
+        pass
+
+    def identify_face(self, face_img: RGB_ndarray_img):
+        pass
