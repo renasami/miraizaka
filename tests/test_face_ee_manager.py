@@ -29,6 +29,18 @@ def test_callback():
     return _test_callback
 
 
+is_skip = {
+    "test_cv2_camera": False,
+    "test_face_recog_detection": False,
+    "test_io": False,
+    "test_scheduler": False,
+}
+
+is_skip["test_cv2_camera"] = True
+is_skip["test_face_recog_detection"] = True
+is_skip["test_io"] = True
+# if_skip["test_scheduler"] = True
+
 camera = [None, "tests/testcase1.mp4"]
 
 
@@ -49,6 +61,7 @@ class Test(unittest.TestCase):
         t = datetime.now() - self.time_begin
         print(f"\nin: {t.total_seconds():.3f}s", end="\n\n\n")
 
+    @unittest.skipIf(is_skip["test_cv2_camera"], "")
     @ddt.data(*camera)
     def test_cv2_camera(self, camera):
         cam = Cv2Camera(path=camera)
@@ -65,6 +78,7 @@ class Test(unittest.TestCase):
         cam.cam.release()
         cv2.destroyAllWindows()
 
+    @unittest.skipIf(is_skip["test_face_recog_detection"], "")
     def test_face_recog_detection(self):
         cam = Cv2Camera(path="tests/testcase1.mp4")
         li = []
@@ -78,10 +92,12 @@ class Test(unittest.TestCase):
 
         print(li)
 
+    @unittest.skipIf(is_skip["test_io"], "")
     def test_io(self):
         eeio = EntryExitIO()
         print(eeio)
 
+    @unittest.skipIf(is_skip["test_scheduler"], "")
     def test_scheduler(self):
         cam = Cv2Camera(path="tests/testcase1.mp4")
         eeio = EntryExitIO()
@@ -90,7 +106,9 @@ class Test(unittest.TestCase):
             camera_obj=cam,
             entry_exit_io_obj=eeio,
             face_detection_obj=f_d,
-            callback=test_callback(),
+            face_identification_obj=None,
+            entry_exit_judgement_obj=None,
+            trigger=None,
             debug=True
         )
         scheduler.start(mode="sync")
