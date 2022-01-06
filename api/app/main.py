@@ -1,17 +1,16 @@
 from fastapi import FastAPI, UploadFile, status, File
 from fastapi.responses import JSONResponse
-import cv2
-# import numpy as np
+import cv2  # noqa
+import numpy as np  # noqa
 
 from typing import List
-# import base64
-from keys import NOTIFY
 import requests
 
 from face_ee_manager.schema import HTTPFace
-from face_ee_manager import decode_img
+from face_ee_manager import decode_img  # noqa
+from app import config
 
-app = FastAPI()
+app = FastAPI(title=config.PROJECT_NAME)
 
 
 @app.get("/")
@@ -39,7 +38,7 @@ def notify(state: int):
     if state > 0: message = "入室"
     else: message = "退出"
     headers = {
-        'Authorization': NOTIFY,
+        'Authorization': config.NOTIFY,
     }
     files = {
         'message': (None, message),
@@ -55,9 +54,8 @@ def test_p(face_list: List[HTTPFace]):
     size_li = []
     for i in face_list:
         size_li.append({"file_size": len(i.img_base64)})
-        print(len(i.img_base64))
-        print(type(i.img_base64))
-        img = decode_img(i.img_base64)
-        img = img[:, :, ::-1]
-        cv2.imwrite("/app/test1.jpg", img)
+        print(len(i.img_base64), type(i.img_base64))
+        # img = decode_img(i.img_base64)
+        # img = img[:, :, ::-1]
+        # cv2.imwrite("/app/test1.jpg", img)
     return JSONResponse(content=size_li, status_code=status.HTTP_200_OK)
