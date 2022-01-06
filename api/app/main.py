@@ -55,9 +55,8 @@ def test_p(face_list: List[HTTPFace]):
     size_li = []
     for i in face_list:
         size_li.append({"file_size": len(i.img_base64)})
-        print(len(i.img_base64))
-        print(type(i.img_base64))
-        img = decode_img(i.img_base64)
-        img = img[:, :, ::-1]
-        cv2.imwrite("/app/test1.jpg", img)
+        print(len(i.img_base64), type(i.img_base64))
+        # img = decode_img(i.img_base64)
+        # img = img[:, :, ::-1]
+        # cv2.imwrite("/app/test1.jpg", img)
     return JSONResponse(content=size_li, status_code=status.HTTP_200_OK)
