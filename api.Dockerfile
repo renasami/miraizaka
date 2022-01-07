@@ -6,12 +6,15 @@ ENV PYTHONPATH=/
 
 # pip installs
 COPY ./api/app /app
-COPY ./face_ee_manager /app/face_ee_manager
+COPY ./face_ee_manager /face_ee_manager
 COPY ./api/requirements.txt requirements.txt
-RUN apt-get update && apt-get upgrade -y
-RUN /usr/local/bin/python -m pip install --upgrade pip
-RUN apt-get install -y libgl1-mesa-dev libglib2.0-dev
-RUN pip install -r requirements.txt
+
+RUN apt-get update &&\
+    apt-get upgrade -y &&\
+    /usr/local/bin/python -m pip install --no-cache-dir --upgrade pip &&\
+    apt-get install -y libgl1-mesa-dev libglib2.0-dev &&\
+    pip install --no-cache-dir -r requirements.txt &&\
+    apt-get clean
 
 # 開発用
 COPY ./api/start.sh /start.sh
