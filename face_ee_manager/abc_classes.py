@@ -15,6 +15,11 @@ class BaseCamera(ABC):
     def frame_height(self):
         pass
 
+    @property
+    @abstractmethod
+    def fps(self):
+        pass
+
     @abstractmethod
     def get_flame(self) -> Tuple[Optional[RGB_ndarray_img], ...]:
         pass
@@ -53,7 +58,7 @@ class BaseFaceDetection(ABC):
         pass
 
 
-#model = vgg16のモデル
+# model = vgg16のモデル
 class BaseFaceIdentification(ABC):
     @property
     @abstractmethod

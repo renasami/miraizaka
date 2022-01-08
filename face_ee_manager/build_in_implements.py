@@ -53,7 +53,7 @@ class Cv2Camera(BaseCamera):
 
         self._frame_width = int(self.cam.get(cv2.CAP_PROP_FRAME_WIDTH))
         self._frame_height = int(self.cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        self.fps = int(self.cam.get(cv2.CAP_PROP_FPS))
+        self._fps = int(self.cam.get(cv2.CAP_PROP_FPS))
 
     @property
     def frame_width(self):
@@ -62,6 +62,10 @@ class Cv2Camera(BaseCamera):
     @property
     def frame_height(self):
         return self._frame_height
+
+    @property
+    def fps(self):
+        return self._fps
 
     def get_flame(self) -> Tuple[RGB_ndarray_img, ...]:
         ret, frame = self.cam.read()
