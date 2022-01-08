@@ -1,8 +1,9 @@
 import asyncio
 from datetime import datetime
-from typing import List, Callable
-from copy import deepcopy
+from typing import List, Callable, Tuple
 import logging
+
+import numpy as np  # noqa: F401
 
 import cv2
 
@@ -87,6 +88,8 @@ class Scheduler:
         for face in face_list:
             face_img = frame[face.top:face.bottom, face.left:face.right]
             id = self.fi.identify_face(face_img)
+            if id is None:
+                continue
 
             ee_raw = EntryExitRaw(
                 datetime=time,
@@ -102,12 +105,11 @@ class Scheduler:
         all_ee_raw_list = []
         ufl = unprocessed_frame_list
         for (frame, time_now), frame_index in zip(ufl, range(len(ufl))):
-            if self.trigger_flag: await asyncio.sleep(5)
 
             # 顔検出
             face_list = self.fd.detect_face(frame)
             if face_list:
-                self.logger.info("%d人が検出されました" % len(face_list))
+                self.logger.debug("%d人が検出されました" % len(face_list))
                 self.logger.debug("face_list: " + str(face_list))
             await asyncio.sleep(0.001)
 
@@ -136,39 +138,49 @@ class Scheduler:
             self.eeio.save_entry_exit(ee)
             self.logger.info("ee: " + str(ee))
 
-    async def async_loop(self) -> None:
+    def collect_frames(self):
+        frame_list: List[Tuple[RGB_ndarray_img, datetime]] = []
+        last_trigged_time = datetime.now()
+        counter = 0
+        while True:
+            frame = self.cam.get_frame()[0]
+            time_now = datetime.now()
 
-        trigged_time = datetime.min
-        unprocessed_frame_list = []
+            frame_list.append((frame, time_now))
+
+            # 1秒ごとにtrigger判断
+            if counter % self.cam.fps == 0:
+                if self._trigger(frame):
+                    last_trigged_time = datetime.now()
+
+                # trigger停止してend_trigger_delay_sec後にbreak
+                elif (datetime.now() - last_trigged_time).total_seconds() > \
+                        self.config.end_trigger_delay_sec:
+
+                    break
+
+            counter += 1
+
+        return frame_list
+
+    async def async_loop(self) -> None:
+        unprocessed_frame_lists = []
         now_task = asyncio.get_event_loop().create_future()
         now_task.set_result(None)
 
         while True:
-            frame = self.cam.get_flame()[0]
-            time_now = datetime.now()
+            frame = self.cam.get_frame()[0]
 
             if self._trigger(frame):
-                # trigger発動するとframeをひたすら貯まる
-                self.trigger_flag = True
-                trigged_time = datetime.now()
-                self.logger.info("%s トリガーが発動されました" % datetime.now().strftime("%x %X"))
+                self.logger.info("triggerが発動した")
+                frame_list = self.collect_frames()
+                self.logger.info(f"{len(frame_list)}フレームを収集した")
+                unprocessed_frame_lists.append(frame_list)
 
-            if self.trigger_flag:
-                unprocessed_frame_list.append((frame, time_now))
-
-                # triggerが一定時間反応がなかったらtrigger_flagを折る
-                passed_time = (datetime.now() - trigged_time).total_seconds()
-                if passed_time > self.config.motion_done_after_sec:
-                    self.trigger_flag = False
-                    meg = "トリガーが解放されました、%dフレームが溜まっています" % len(unprocessed_frame_list)
-                    self.logger.info(meg)  # yapf:disable
-
-            # trigger_flagが立っていない時は溜まったframeを処理する
-            elif now_task.done() and unprocessed_frame_list:
+            if now_task.done() and unprocessed_frame_lists:
                 self.logger.info("新しいprocessを開始します")
-                new_task = self.__process(deepcopy(unprocessed_frame_list))
+                new_task = self.__process(unprocessed_frame_lists.pop(0))
                 now_task = asyncio.create_task(new_task)
-                unprocessed_frame_list = []
 
             await asyncio.sleep(1 / int(self.config.trigger_rate * 1.2))
 
@@ -178,7 +190,7 @@ class Scheduler:
         last_detected_time = datetime.now()
 
         while True:
-            frame = self.cam.get_flame()[0]
+            frame = self.cam.get_frame()[0]
             if frame is None: break
             time_now = datetime.now()
 
