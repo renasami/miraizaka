@@ -25,8 +25,8 @@ def make_diff_trigger():
             last_img = img
             return False
 
-        abs_im_diff = img.astype(int) - last_img.astype(int)
-        if abs_im_diff.max() > 20:
+        abs_im_diff = np.abs(img.astype(int) - last_img.astype(int))
+        if np.average(abs_im_diff) > 5:
             last_img = img
             return True
         else:
@@ -67,7 +67,7 @@ class Cv2Camera(BaseCamera):
     def fps(self):
         return self._fps
 
-    def get_flame(self) -> Tuple[RGB_ndarray_img, ...]:
+    def get_frame(self) -> Tuple[RGB_ndarray_img, ...]:
         ret, frame = self.cam.read()
         if frame is not None: frame = frame[:, :, ::-1]
         return frame, ret
