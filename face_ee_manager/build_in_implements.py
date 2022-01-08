@@ -198,7 +198,7 @@ class EntryExitJudgement(BaseEntryExitJudgement):
         self,
         entry_exit_raw_list,
     ) -> List[EntryExit]:
-        pass
+        return []
 
 
 class TorchFaceRecognition(BaseFaceIdentification):
