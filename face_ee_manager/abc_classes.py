@@ -21,7 +21,7 @@ class BaseCamera(ABC):
         pass
 
     @abstractmethod
-    def get_flame(self) -> Tuple[Optional[RGB_ndarray_img], ...]:
+    def get_frame(self) -> Tuple[Optional[RGB_ndarray_img], ...]:
         pass
 
 
