@@ -37,6 +37,12 @@ class HTTPFace(FaceSchema):
     img_base64: bytes
 
 
+class HTTPFacePack(BaseModel):
+    index: int
+    total: int
+    faces: List[HTTPFace]
+
+
 class EntryExitRawBase(FaceSchema):
     identification: Union[int, str]
 
@@ -76,7 +82,7 @@ class FaceDetectPrama(BaseModel):
 
 
 class SchedulerConfig(BaseModel):
-    motion_done_after_sec: int = 5
+    end_trigger_delay_sec: int = 3
     trigger_rate: int = 3
 
 
