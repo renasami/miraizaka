@@ -29,12 +29,3 @@ services:
       - 8888:8888
     volumes:
       - ./machine_learn:/app
-  
-  recognition_api:
-    build: 
-      context: .
-      dockerfile: ./recognition_api/Dockerfile
-    ports: 8000:80
-    restart: always
-    volumes: ./recognition_api:/app
-
