@@ -14,6 +14,7 @@ from datetime import datetime
 import cv2
 
 from face_ee_manager import Cv2Camera, FaceRecogDetection, EntryExitIO, Scheduler
+from face_ee_manager.build_in_implements import make_diff_trigger
 
 
 def test_callback():
@@ -34,12 +35,14 @@ is_skip = {
     "test_face_recog_detection": False,
     "test_io": False,
     "test_scheduler": False,
+    "test_trigger": False,
 }
 
 is_skip["test_cv2_camera"] = True
 is_skip["test_face_recog_detection"] = True
 is_skip["test_io"] = True
-# if_skip["test_scheduler"] = True
+is_skip["test_scheduler"] = True
+# is_skip["test_trigger"] = True
 
 camera = [None, "tests/testcase1.mp4"]
 
@@ -69,8 +72,8 @@ class Test(unittest.TestCase):
         print(cam.frame_height)
         print(cam.fps)
         for i in range(30):
-            flame = cam.get_flame()[0]
-            cv2.imshow('video', flame[:, :, ::-1])
+            frame = cam.get_frame()[0]
+            cv2.imshow('video', frame[:, :, ::-1])
             k = cv2.waitKey(30) & 0xff
             if k == 27:  # press 'ESC' to quit
                 break
@@ -83,7 +86,7 @@ class Test(unittest.TestCase):
         cam = Cv2Camera(path="tests/testcase1.mp4")
         li = []
         while True:
-            img, ret = cam.get_flame()
+            img, ret = cam.get_frame()
             if not ret:
                 break
 
@@ -112,6 +115,24 @@ class Test(unittest.TestCase):
             debug=True
         )
         scheduler.start(mode="sync")
+
+    @unittest.skipIf(is_skip["test_trigger"], "")
+    def test_trigger(self):
+        trigger = make_diff_trigger()
+        cam = Cv2Camera(path="tests/testcase1.mp4")
+        frame, ret = cam.get_frame()
+        while ret:
+            font = cv2.FONT_HERSHEY_DUPLEX
+            cv2.putText(frame[:, :, ::-1], str(trigger(frame)), (0, 50), font, 1.0, (0, 0, 0), 1)
+            cv2.imshow("video", frame[:, :, ::-1])
+            k = cv2.waitKey(30) & 0xff
+            if k == 27:  # press 'ESC' to quit
+                break
+
+            frame, ret = cam.get_frame()
+
+        cam.cam.release()
+        cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":

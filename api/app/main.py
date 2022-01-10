@@ -6,7 +6,7 @@ import numpy as np  # noqa
 from typing import List
 import requests
 
-from face_ee_manager.schema import HTTPFace
+from face_ee_manager.schema import HTTPFace, HTTPFacePack
 from face_ee_manager import decode_img  # noqa
 from app import config
 
@@ -59,6 +59,13 @@ def test_p(face_list: List[HTTPFace]):
         # img = img[:, :, ::-1]
         # cv2.imwrite("/app/test1.jpg", img)
     return JSONResponse(content=size_li, status_code=status.HTTP_200_OK)
+
+
+@app.post("/test_async")
+def test_async(face_pack: HTTPFacePack):
+    print(face_pack.index)
+    print(face_pack.total)
+    return face_pack
 
 
 @app.post("/recognize")

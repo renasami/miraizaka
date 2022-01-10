@@ -6,14 +6,13 @@ sys.path.append(
     os.path.abspath(os.path.dirname(os.path.abspath(__file__)) + os.path.sep + "..")
 )
 
-import json
 import requests
 import logging
 
 from face_ee_manager import Cv2Camera, EntryExitIO, FaceRecogDetection, Scheduler, encode_img, make_diff_trigger, FaceIdentification, EntryExitJudgement
-from face_ee_manager.schema import FaceBase, HTTPFace
+from face_ee_manager.schema import FaceBase, HTTPFace, HTTPFacePack
 
-http_face_url = "http://localhost:8080/test"
+http_face_url = "http://localhost:8080/test_async"
 
 
 class EntryExitIO(EntryExitIO):
@@ -40,21 +39,19 @@ class EntryExitIO(EntryExitIO):
                 img_base64=img_base64,
             )
 
-            self.data.append(json.loads(http_face.json()))
+            self.data.append(http_face)
 
-        j = {
-            "index": frame_index // max_send_frames + 1,
-            "total": (frame_len - 1) // max_send_frames + 1,
-            "data": self.data,
-        }
+        if (frame_index + 1) % max_send_frames == 0 or (frame_len - 1) == frame_index:
+            data = HTTPFacePack(
+                index=frame_index // max_send_frames + 1,
+                total=(frame_len - 1) // max_send_frames + 1,
+                faces=self.data
+            )
+            res = requests.post(url=http_face_url, data=data.json())
 
-        if (frame_index + 1) % max_send_frames == 0:
-            res = requests.post(url=http_face_url, json=j)
-        elif (frame_len - 1) == frame_index:
-            res = requests.post(url=http_face_url, json=j)
-
-        if res.ok:
-            self.data = []
+            if res.ok:
+                self.data = []
+                # print(res.json())
 
 
 scheduler = Scheduler(

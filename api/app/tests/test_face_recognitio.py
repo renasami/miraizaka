@@ -12,4 +12,4 @@ from main import recognize
 
 class Test(unittest.TestCase):
     def test_recog(self):
-        self.assertEqual(1,recognize())
+        self.assertEqual(1, recognize())
