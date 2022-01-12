@@ -3,3 +3,6 @@ __pycache__
 /.coverage
 /.env
 /redis_data
+/tests/db_test.py
+/tests/insert_user.py
+/index.html
