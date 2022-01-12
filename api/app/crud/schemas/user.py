@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel
@@ -19,3 +20,11 @@ class UserCreate(UserBase):
 
 class UserUpdate(UserBase):
     pass
+
+
+class UserInDB(UserBase):
+    id: int
+
+
+class NowMember(UserInDB):
+    time: datetime

@@ -3,19 +3,21 @@ import logging
 
 from fastapi import FastAPI, Depends
 from fastapi import Request, Response
+from fastapi.encoders import jsonable_encoder
 from starlette.middleware.cors import CORSMiddleware
 
-import cv2  # noqa
-import numpy as np  # noqa
+import cv2  # noqa: F401
+import numpy as np  # noqa: F401
 from sqlalchemy.orm import Session
 
 from face_ee_manager.schema import HTTPFace, HTTPFacePack  # noqa: F401
 from face_ee_manager import decode_img  # noqa: F401
 from app import config
 from app.db.session import session
+from app.db.redis_instance import redis_maker
 from app.utils import get_db
 from app import crud
-from app.crud.schemas.user import UserCreate
+from app.crud.schemas.user import UserCreate, NowMember
 from app.test_router import router as test_router
 
 app = FastAPI(title=config.PROJECT_NAME)
@@ -76,3 +78,23 @@ def recognize():
 @app.post("/add-user")
 def add_user(user_in: UserCreate, db: Session = Depends(get_db)):
     return crud.user.create(db, obj_in=user_in)
+
+
+@app.get("/get-now-member")
+def get_now_member(db: Session = Depends(get_db)):
+    r = redis_maker()
+    now_member: dict[str, str] = r.hgetall("now_member")
+
+    res = []
+    for id, in_time in now_member.items():
+        user = crud.user.get(db, id)
+        res.append(NowMember(
+            **jsonable_encoder(user),
+            time=in_time,
+        ))
+    return res
+
+
+@app.get("/get-all-ungraduated-member")
+def get_all_ungraduated_member(db: Session = Depends(get_db)):
+    return crud.user.get_all_ungraduated_member(db)
