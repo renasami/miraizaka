@@ -63,4 +63,5 @@ def test_p(face_list: List[HTTPFace]):
 
 @app.post("/recognize")
 def recognize():
+    
     return 1
