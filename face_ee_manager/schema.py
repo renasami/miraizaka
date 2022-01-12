@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, Tuple, List, Any, Union
+from typing import Optional, Tuple, List, Union
 from datetime import datetime
 from enum import Enum
 import numpy as np
@@ -82,28 +82,5 @@ class FaceDetectPrama(BaseModel):
 
 
 class SchedulerConfig(BaseModel):
-    end_trigger_delay_sec: int = 3
+    end_trigger_delay_sec: int = 2
     trigger_rate: int = 3
-
-
-class FaceDetectionConfig(BaseModel):
-    show_window: bool = False
-    send_http: bool = True
-    debug: bool = False
-    frame_width: int = None
-    frame_height: int = None
-    front_faceCascade_path: Optional[str] = None
-    profile_faceCascade_path: str = "./haarcascades/haarcascade_profileface.xml"
-    front_face_detect_prama: Optional[FaceDetectPrama] = None
-    right_face_detect_prama: FaceDetectPrama = FaceDetectPrama(
-        scaleFactor=2, minNeighbors=3, minSize=(20, 20)
-    )
-    left_face_detect_prama: FaceDetectPrama = FaceDetectPrama(
-        scaleFactor=2, minNeighbors=3, minSize=(20, 20)
-    )
-
-
-class UncodedData(BaseModel):
-    datetime: datetime
-    img: Any
-    faces: List[FaceBase]
