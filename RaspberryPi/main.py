@@ -8,11 +8,12 @@ sys.path.append(
 
 import requests
 import logging
+# import asyncio
 
 from face_ee_manager import Cv2Camera, EntryExitIO, FaceRecogDetection, Scheduler, encode_img, make_diff_trigger, FaceIdentification, EntryExitJudgement
 from face_ee_manager.schema import FaceBase, HTTPFace, HTTPFacePack
 
-http_face_url = "http://localhost:8080/test_async"
+http_face_url = "http://localhost:8080/receive_face_data"
 
 
 class EntryExitIO(EntryExitIO):
@@ -47,6 +48,9 @@ class EntryExitIO(EntryExitIO):
                 total=(frame_len - 1) // max_send_frames + 1,
                 faces=self.data
             )
+            # loop = asyncio.get_running_loop()
+            # future = loop.run_in_executor(None, requests.post, http_face_url, data.json())
+            # res = await future
             res = requests.post(url=http_face_url, data=data.json())
 
             if res.ok:

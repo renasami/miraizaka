@@ -114,6 +114,8 @@ class Scheduler:
             await asyncio.sleep(0.001)
 
             if hasattr(self.eeio, "send_face_list"):
+                # http_task = self.eeio.send_face_list(face_list, time_now, frame, frame_index, len(ufl))  # yapf: disable
+                # asyncio.create_task(http_task)
                 self.eeio.send_face_list(face_list, time_now, frame, frame_index, len(ufl))  # yapf: disable
 
             # 顔識別

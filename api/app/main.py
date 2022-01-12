@@ -10,8 +10,9 @@ import cv2  # noqa: F401
 import numpy as np  # noqa: F401
 from sqlalchemy.orm import Session
 
-from face_ee_manager.schema import HTTPFace, HTTPFacePack  # noqa: F401
+from face_ee_manager.schema import HTTPFacePack, Direction, EntryExitRaw  # noqa: F401
 from face_ee_manager import decode_img  # noqa: F401
+from app.utils import FaceIdentification, EntryExitJudgement
 from app import config
 from app.db.session import session
 from app.db.redis_instance import redis_maker
@@ -98,3 +99,45 @@ def get_now_member(db: Session = Depends(get_db)):
 @app.get("/get-all-ungraduated-member")
 def get_all_ungraduated_member(db: Session = Depends(get_db)):
     return crud.user.get_all_ungraduated_member(db)
+
+
+profile_faceCascade = cv2.CascadeClassifier(
+    "/face_ee_manager/haarcascades/haarcascade_profileface.xml"
+)
+f_i = FaceIdentification()
+f_j = EntryExitJudgement()
+temp = []
+
+
+@app.post("/receive_face_data")
+def receive_face_data(face_pack: HTTPFacePack):
+    global profile_faceCascade
+    global temp
+
+    li = []
+    for face in face_pack.faces:
+        img = decode_img(face.img_base64)
+        gray = cv2.cvtColor(img[:, :, ::-1], cv2.COLOR_BGR2GRAY)
+        profile_faces = profile_faceCascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=2,
+            minSize=(20, 20),
+        )
+        if type(profile_faces) == np.ndarray:
+            print("L")
+            face.direction = Direction.LEFT_FACE
+        else:
+            face.direction = Direction.RIGHT_FACE
+
+        id = f_i.identify_face(img)
+        li.append(EntryExitRaw(**face.dict(), identification=id))
+
+    temp += li
+    print(len(temp))
+    if face_pack.index == face_pack.total:
+        a = f_j.judge_entry_exit(temp)
+        print(a)
+        temp = []
+
+    return li

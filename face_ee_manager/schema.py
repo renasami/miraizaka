@@ -82,5 +82,5 @@ class FaceDetectPrama(BaseModel):
 
 
 class SchedulerConfig(BaseModel):
-    end_trigger_delay_sec: int = 2
+    end_trigger_delay_sec: int = 3
     trigger_rate: int = 3
