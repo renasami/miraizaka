@@ -21,6 +21,11 @@ from app import crud
 from app.crud.schemas.user import UserCreate, NowMember
 from app.test_router import router as test_router
 
+import datetime
+import random
+
+from face_eval import eval
+
 app = FastAPI(title=config.PROJECT_NAME)
 app.include_router(test_router, prefix="/test", tags=["test"])
 logger = logging.getLogger("uvicorn.error")
@@ -115,9 +120,14 @@ def receive_face_data(face_pack: HTTPFacePack):
     global temp
 
     li = []
-    for face in face_pack.faces:
+    date =  datetime.datetime.now().strftime("%Y%m%d%H%M")
+    rand = random.random()
+    file_path = "tmp/{date}{rand}/".format(date,rand)
+    for i,face in enumerate(face_pack.faces):
         img = decode_img(face.img_base64)
+        #gray case numpy array
         gray = cv2.cvtColor(img[:, :, ::-1], cv2.COLOR_BGR2GRAY)
+        cv2.imwrite("{file_path}/img/{i}.png".format(file_path,i),gray)
         profile_faces = profile_faceCascade.detectMultiScale(
             gray,
             scaleFactor=1.1,
@@ -130,7 +140,8 @@ def receive_face_data(face_pack: HTTPFacePack):
         else:
             face.direction = Direction.RIGHT_FACE
 
-        id = f_i.identify_face(img)
+        # id = f_i.identify_face(img)
+        id = eval(file_path)
         li.append(EntryExitRaw(**face.dict(), identification=id))
 
     temp += li
