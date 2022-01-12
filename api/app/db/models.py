@@ -18,8 +18,8 @@ class Grade(str, PyEnum):
 
 
 class EEAction(PyEnum):
-    ENTRY = 0
-    EXIT = 1
+    ENTRY = "ENTRY"
+    EXIT = "EXIT"
 
 
 class User(Base):

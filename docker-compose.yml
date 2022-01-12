@@ -1,10 +1,13 @@
 services:
   api:  
+    depends_on:
+      - db
+      - redis
     build: 
       context: .
       dockerfile: ./api.Dockerfile
     env_file: 
-      - ${ENV_FILE_PATH:-api/.env}
+      - ${ENV_FILE_PATH:-.env}
     ports: 
       - 8080:80
     restart: always
@@ -15,11 +18,19 @@ services:
   db:
     image: mariadb:latest
     env_file: 
-      - ${ENV_FILE_PATH:-api/.env}
+      - ${ENV_FILE_PATH:-.env}
     ports:
       - 3306:3306
     # volumes: 
     # - ./db/data:/var/lib/mysql
+
+  redis:
+    image: redis
+    command: redis-server --requirepass ${REDIS_REQUIREPASS:?requirepass is not set} --save ${REDIS_SECONDS:-60} ${REDIS_CHANGES:-1}
+    volumes:
+      - ./redis_data:/data
+    ports:
+      - 6379:6379
 
   machine_learn:
     build: 
