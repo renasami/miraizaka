@@ -2,3 +2,4 @@ __pycache__/
 */keys.py
 *.pth
 /.env
+/app/tests/test_data.json

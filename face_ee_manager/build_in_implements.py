@@ -25,8 +25,8 @@ def make_diff_trigger():
             last_img = img
             return False
 
-        abs_im_diff = img.astype(int) - last_img.astype(int)
-        if abs_im_diff.max() > 20:
+        abs_im_diff = np.abs(img.astype(int) - last_img.astype(int))
+        if np.average(abs_im_diff) > 5:
             last_img = img
             return True
         else:
@@ -53,7 +53,7 @@ class Cv2Camera(BaseCamera):
 
         self._frame_width = int(self.cam.get(cv2.CAP_PROP_FRAME_WIDTH))
         self._frame_height = int(self.cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        self.fps = int(self.cam.get(cv2.CAP_PROP_FPS))
+        self._fps = int(self.cam.get(cv2.CAP_PROP_FPS))
 
     @property
     def frame_width(self):
@@ -63,7 +63,11 @@ class Cv2Camera(BaseCamera):
     def frame_height(self):
         return self._frame_height
 
-    def get_flame(self) -> Tuple[RGB_ndarray_img, ...]:
+    @property
+    def fps(self):
+        return self._fps
+
+    def get_frame(self) -> Tuple[RGB_ndarray_img, ...]:
         ret, frame = self.cam.read()
         if frame is not None: frame = frame[:, :, ::-1]
         return frame, ret
@@ -194,7 +198,7 @@ class EntryExitJudgement(BaseEntryExitJudgement):
         self,
         entry_exit_raw_list,
     ) -> List[EntryExit]:
-        pass
+        return []
 
 
 class TorchFaceRecognition(BaseFaceIdentification):
@@ -205,7 +209,8 @@ class TorchFaceRecognition(BaseFaceIdentification):
     @model.setter
     def model(self, val):
         pass
-    def decode_base64(self,img_str:base64) -> RGB_ndarray_img:
+
+    def decode_base64(self, img_str: base64) -> RGB_ndarray_img:
         return base64.b64decode(img_str).decode()
 
     def identify_face(self, face_img: RGB_ndarray_img) -> int:
