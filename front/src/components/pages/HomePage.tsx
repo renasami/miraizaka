@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import GenericTemplate from "../templates/GenericTemplate";
 import {Bar} from 'react-chartjs-2'
 
@@ -25,7 +25,14 @@ const data ={
 }
 
 
+
 const HomePage: React.FC = () => {
+  // const [state,setState] = useState();
+  // const url = "http://localhost:8080/get-now-member"
+  // useEffect(()=>{
+  //   fetch(url).then(resp => resp.json())
+  //             .then(json => console.log(json))
+  // })
   return (
     <GenericTemplate title="トップページ">
       <div>
