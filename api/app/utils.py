@@ -3,7 +3,7 @@ from typing import List
 from starlette.requests import Request
 
 from face_ee_manager.abc_classes import BaseFaceIdentification, BaseEntryExitJudgement
-from face_ee_manager.schema import RGB_ndarray_img, EntryExitRaw, EntryExit, Direction
+from face_ee_manager.schema import RGB_ndarray_img, EntryExitRaw, EntryExit, Direction, EEAction
 
 
 def get_db(request: Request):
@@ -20,7 +20,7 @@ class FaceIdentification(BaseFaceIdentification):
         pass
 
     def identify_face(self, face_img: RGB_ndarray_img):
-        return "sei"
+        return 7
 
 
 class EntryExitJudgement(BaseEntryExitJudgement):
@@ -36,6 +36,7 @@ class EntryExitJudgement(BaseEntryExitJudgement):
             else:
                 ee_raw_name_dict[ee_raw.identification] = [ee_raw]
 
+        res = []
         for key, ee_raw_list in ee_raw_name_dict.items():
             right_face = 0
             left_face = 0
@@ -46,6 +47,22 @@ class EntryExitJudgement(BaseEntryExitJudgement):
                     right_face += 1
 
             if right_face - left_face > 0:
-                return "right"
+                # right face
+                res.append(
+                    EntryExit(
+                        datetime=ee_raw_list[0].datetime,
+                        identify_id=key,
+                        action=EEAction.EXIT
+                    )
+                )
             else:
-                return "left"
+                # left face
+                res.append(
+                    EntryExit(
+                        datetime=ee_raw_list[0].datetime,
+                        identify_id=key,
+                        action=EEAction.ENTRY
+                    )
+                )
+
+        return res

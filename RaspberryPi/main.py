@@ -53,8 +53,8 @@ class EntryExitIO(EntryExitIO):
             # res = await future
             res = requests.post(url=http_face_url, data=data.json())
 
-            if res.ok:
-                self.data = []
+            # if res.ok:
+            self.data = []
                 # print(res.json())
 
 

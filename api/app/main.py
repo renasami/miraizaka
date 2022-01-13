@@ -19,12 +19,13 @@ from app.db.redis_instance import redis_maker
 from app.utils import get_db
 from app import crud
 from app.crud.schemas.user import UserCreate, NowMember
+from app.crud.schemas.entry_exit_record import EntryExitRecordCreate
 from app.test_router import router as test_router
 
-import datetime
-import random
-
-from face_eval import eval
+# import datetime
+# import random
+# import os
+# from face_eval import eval
 
 app = FastAPI(title=config.PROJECT_NAME)
 app.include_router(test_router, prefix="/test", tags=["test"])
@@ -115,19 +116,21 @@ temp = []
 
 
 @app.post("/receive_face_data")
-def receive_face_data(face_pack: HTTPFacePack):
+def receive_face_data(face_pack: HTTPFacePack, db: Session = Depends(get_db)):
     global profile_faceCascade
     global temp
 
     li = []
-    date =  datetime.datetime.now().strftime("%Y%m%d%H%M")
-    rand = random.random()
-    file_path = "tmp/{date}{rand}/".format(date,rand)
-    for i,face in enumerate(face_pack.faces):
+    # date = datetime.datetime.now().strftime("%Y%m%d%H%M")
+    # rand = random.random()
+    # file_path = f"/app/tmp/{date}{rand}/"
+    # os.makedirs(file_path + 'img/')
+    left = 0
+    for i, face in enumerate(face_pack.faces):
         img = decode_img(face.img_base64)
-        #gray case numpy array
+        # gray case numpy array
         gray = cv2.cvtColor(img[:, :, ::-1], cv2.COLOR_BGR2GRAY)
-        cv2.imwrite("{file_path}/img/{i}.png".format(file_path,i),gray)
+        # cv2.imwrite(f"{file_path}/img/{i}.png", gray)
         profile_faces = profile_faceCascade.detectMultiScale(
             gray,
             scaleFactor=1.1,
@@ -135,20 +138,31 @@ def receive_face_data(face_pack: HTTPFacePack):
             minSize=(20, 20),
         )
         if type(profile_faces) == np.ndarray:
-            print("L")
+            left += 1
             face.direction = Direction.LEFT_FACE
         else:
             face.direction = Direction.RIGHT_FACE
 
-        # id = f_i.identify_face(img)
-        id = eval(file_path)
+        id = f_i.identify_face(img)
+        # logger.info("識別中...")
+        # id = eval(file_path)
+        # print("id:", id, "\ntype:", type(id))
         li.append(EntryExitRaw(**face.dict(), identification=id))
+    logger.info(f"{len(face_pack.faces)}, L:{left}")
 
     temp += li
-    print(len(temp))
+    # print(len(temp))
     if face_pack.index == face_pack.total:
-        a = f_j.judge_entry_exit(temp)
-        print(a)
-        temp = []
+        ee_list = f_j.judge_entry_exit(temp)
+        logger.info(ee_list)
 
+        for ee in ee_list:
+            obj_in = EntryExitRecordCreate(
+                time=ee.datetime,
+                user_id=ee.identify_id,
+                action=ee.action,
+            )
+            crud.ee_record.create(db, obj_in=obj_in)
+
+        temp = []
     return li
