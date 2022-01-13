@@ -13,9 +13,9 @@ class Direction(Enum):
     RIGHT_FACE = -1
 
 
-class EntryOrExit(Enum):
-    ENTRY = 0
-    EXIT = 1
+class EEAction(Enum):
+    ENTRY = "ENTRY"
+    EXIT = "EXIT"
 
 
 # ！！重要データ構造
@@ -64,7 +64,7 @@ class EntryExitRawDBCreate(EntryExitInRawDB):
 class EntryExitBase(BaseModel):
     datetime: datetime
     identify_id: Union[int, str]
-    entry_or_exit: EntryOrExit
+    action: EEAction
 
 
 class EntryExit(EntryExitBase):

@@ -5,6 +5,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.mysql import YEAR
 
 from app.db.base_class import Base
+from face_ee_manager.schema import EEAction
 
 
 class Grade(str, PyEnum):
@@ -15,11 +16,6 @@ class Grade(str, PyEnum):
     M2 = "M2"
     D = "D"
     GRADUATED = "GRADUATED"
-
-
-class EEAction(PyEnum):
-    ENTRY = "ENTRY"
-    EXIT = "EXIT"
 
 
 class User(Base):
