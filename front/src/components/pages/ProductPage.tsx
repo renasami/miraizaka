@@ -84,14 +84,15 @@ const ProductPage: React.FC = () => {
           const time = Date.now() - Date.parse(d.time);
           return createData(d.display_name, d.grade, Math.floor(time / 60000));
         });
+        console.log(data)
         setState([...data]);
+        console.log(state)
       });
   },[]);
   
   return (
       <>
-          {state[0] ?  state.map((row) => (
-            <GenericTemplate title="今居るメンバー">
+      <GenericTemplate title="今居るメンバー">
             <TableContainer component={Paper}>
             <Table className={classes.table} aria-label="simple table">
               <TableHead>
@@ -101,6 +102,8 @@ const ProductPage: React.FC = () => {
                   <TableCell align="right">時間(分)</TableCell>
                 </TableRow>
               </TableHead>
+          {state ?  state.map((row) => (
+            
               <TableBody>
               <TableRow key={row.name}>
                 <TableCell component="th" scope="row">
@@ -110,11 +113,13 @@ const ProductPage: React.FC = () => {
                 <TableCell align="right">{row.time}</TableCell>
               </TableRow>
               </TableBody>
-              </Table>
-            </TableContainer>
-             </GenericTemplate>
+              
+            
             )) : <GenericTemplate title="今は誰もいません" children={undefined}></GenericTemplate>
           }
+          </Table>
+          </TableContainer>
+          </GenericTemplate>
         </>
    
   );
