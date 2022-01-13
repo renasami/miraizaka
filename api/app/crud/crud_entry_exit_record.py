@@ -20,7 +20,7 @@ class CRUDEntryExitRecord(
         if obj_in.action == EEAction.EXIT:
             r.hdel("now_member", obj_in.user_id)
         elif obj_in.action == EEAction.ENTRY:
-            r.hset("now_member", obj_in.user_id, obj_in.time)
+            r.hset("now_member", obj_in.user_id, str(obj_in.time))
         return res
 
     def update(self) -> None:
