@@ -73,7 +73,7 @@ const ProductPage: React.FC = () => {
       "id": 5,
       "time": "2022-01-09T14:03:55"
     }]
-  const url = "http://localhost:8080/get-now-member"
+  const url = "http://10.0.0.64:8080/get-now-member"
   const [state,setState] = useState<NowMember[]>([]);
   
   useEffect(() => {
